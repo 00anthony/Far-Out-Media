@@ -56,8 +56,8 @@ export default function ServicesClient({ packages }: { packages: Package[] }) {
       {/* ── Hero ── */}
       <section ref={heroRef} className="relative pt-40 pb-32 overflow-hidden">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[#C2B280]/6 rounded-full blur-[150px]" />
-          <div className="absolute top-20 right-0 w-[300px] h-[300px] bg-[#94aec2]/5 rounded-full blur-[100px]" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-125 bg-[#C2B280]/6 rounded-full blur-[150px]" />
+          <div className="absolute top-20 right-0 w-75 h-75 bg-[#94aec2]/5 rounded-full blur-[100px]" />
         </div>
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.03]"
@@ -82,7 +82,7 @@ export default function ServicesClient({ packages }: { packages: Package[] }) {
             <div className="max-w-4xl">
               <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none mb-8">
                 Services &amp;{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-br from-white via-zinc-300 to-zinc-600">
+                <span className="text-transparent bg-clip-text bg-linear-to-br from-white via-zinc-300 to-zinc-600">
                   Packages
                 </span>
               </h1>
@@ -98,7 +98,7 @@ export default function ServicesClient({ packages }: { packages: Package[] }) {
             initial={{ opacity: 0, y: 24 }}
             animate={heroInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.2, ease }}
-            className="mt-16 flex flex-wrap gap-x-16 gap-y-6 border-t border-white/[0.06] pt-10"
+            className="mt-16 flex flex-wrap gap-x-16 gap-y-6 border-t border-white/6 pt-10"
           >
             {[
               { value: "FAA", label: "Part 107 Licensed" },
@@ -120,7 +120,7 @@ export default function ServicesClient({ packages }: { packages: Package[] }) {
       </section>
 
       {/* ── Filter tabs ── */}
-      <div className="sticky top-15 z-40 bg-[#080808]/90 backdrop-blur-md border-b border-white/[0.06]">
+      <div className="sticky top-15 z-40 bg-[#080808]/90 backdrop-blur-md border-b border-white/6">
         <div className="container mx-auto px-6 md:px-12">
           <div className="flex items-center gap-1 py-4 overflow-x-auto">
             {(
@@ -220,8 +220,8 @@ function PackageCard({
       transition={{ duration: 0.6, delay: index * 0.07, ease }}
       className={`group relative border transition-colors duration-500 ${
         pkg.featured
-          ? "border-[#C2B280]/40 bg-[#C2B280]/[0.03]"
-          : "border-white/[0.06] bg-white/[0.01] hover:border-white/10"
+          ? "border-[#C2B280]/40 bg-[#C2B280]/3"
+          : "border-white/6 bg-white/1 hover:border-white/10"
       }`}
     >
       {pkg.featured && (
@@ -303,13 +303,13 @@ function PackageCard({
             transition={{ duration: 0.5, ease }}
             className="overflow-hidden"
           >
-            <div className="border-t border-white/[0.06] px-8 md:px-10 pb-10 pt-0">
+            <div className="border-t border-white/6 px-8 md:px-10 pb-10 pt-0">
               <p className="text-zinc-400 text-sm leading-relaxed max-w-2xl pt-8 mb-8">
                 {pkg.description}
               </p>
 
               {/* Tabs */}
-              <div className="flex gap-0 border-b border-white/[0.06] mb-8">
+              <div className="flex gap-0 border-b border-white/6 mb-8">
                 {(["deliverables", "addons", "faq"] as const).map((tab) => (
                   <button
                     key={tab}
@@ -348,7 +348,7 @@ function PackageCard({
                     {pkg.deliverables.map((d: Deliverable, i: number) => (
                       <div
                         key={i}
-                        className="flex items-start gap-3 p-4 border border-white/[0.04] bg-white/[0.01]"
+                        className="flex items-start gap-3 p-4 border border-white/4 bg-white/1"
                       >
                         <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C2B280]/70 shrink-0" />
                         <div>
@@ -374,7 +374,7 @@ function PackageCard({
                     {pkg.addOns.map((a: AddOn, i: number) => (
                       <div
                         key={i}
-                        className="p-4 border border-white/[0.04] bg-white/[0.01] flex flex-col gap-1"
+                        className="p-4 border border-white/4 bg-white/1 flex flex-col gap-1"
                       >
                         <div className="flex items-baseline justify-between gap-2">
                           <p className="text-sm font-black text-white/80 tracking-tight">
@@ -451,7 +451,7 @@ function FAQItem({
 }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border border-white/[0.04]">
+    <div className="border border-white/4">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between gap-4 p-4 text-left"
@@ -486,7 +486,7 @@ function FAQItem({
             transition={{ duration: 0.3, ease }}
             className="overflow-hidden"
           >
-            <p className="px-4 pb-4 text-sm text-zinc-500 leading-relaxed border-t border-white/[0.04] pt-3">
+            <p className="px-4 pb-4 text-sm text-zinc-500 leading-relaxed border-t border-white/4 pt-3">
               {answer}
             </p>
           </motion.div>
@@ -511,7 +511,7 @@ function MetaPill({
       className={`flex items-center gap-2 px-3 py-1.5 border text-xs font-semibold ${
         highlight
           ? "border-[#C2B280]/40 text-[#C2B280] bg-[#C2B280]/5"
-          : "border-white/[0.08] text-zinc-400"
+          : "border-white/8 text-zinc-400"
       }`}
     >
       {icon}
@@ -528,10 +528,10 @@ function BottomCTA() {
   return (
     <section
       ref={ref}
-      className="relative py-40 overflow-hidden border-t border-white/[0.04]"
+      className="relative py-40 overflow-hidden border-t border-white/4"
     >
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-[#C2B280]/5 rounded-full blur-[130px]" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-175 h-100 bg-[#C2B280]/5 rounded-full blur-[130px]" />
       </div>
       <div className="container mx-auto px-6 md:px-12 relative z-10 text-center">
         <motion.div
@@ -544,7 +544,7 @@ function BottomCTA() {
           </span>
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-none">
             Let's Build the{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-600">
+            <span className="text-transparent bg-clip-text bg-linear-to-b from-white to-zinc-600">
               Right Fit.
             </span>
           </h2>
