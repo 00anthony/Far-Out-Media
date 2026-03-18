@@ -23,11 +23,14 @@ export default function Navbar() {
       }`}
     >
       <div className="container mx-auto px-6 md:px-12 flex justify-between items-center">
-        <div className="flex items-center space-x-2">
+        <a 
+          href='/'
+          className="flex items-center space-x-2"
+        >
           <span className="text-xl font-bold tracking-widest uppercase">
             Far Out <span className="text-[#C2B280]">Media</span>
           </span>
-        </div>
+        </a>
         
         <nav className="hidden md:flex space-x-10 text-xs font-semibold tracking-widest uppercase text-gray-400">
           <a href="/#work" className="hover:text-white transition-colors">Work</a>
