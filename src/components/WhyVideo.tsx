@@ -30,8 +30,8 @@ export default function WhyVideo() {
           </div>
 
           <div className="mt-20 p-12 bg-zinc-900/50 text-center border border-white/5">
-            <h3 className="text-2xl font-bold mb-4 tracking-tight">Anyone can shoot video. The difference is intent.</h3>
-            <p className="text-gray-500 max-w-2xl mx-auto italic">
+            <h3 className="font-inter text-2xl font-bold mb-4 tracking-tight">Anyone can shoot video. The difference is intent.</h3>
+            <p className="text-gray-500 font-inter max-w-2xl mx-auto italic">
               "Far Out Media doesn't just deliver footage; they deliver visual assets that tell a strategic story."
             </p>
           </div>
