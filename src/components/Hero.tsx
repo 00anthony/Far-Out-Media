@@ -43,7 +43,7 @@ export default function Hero() {
             <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
           </a>
           <a 
-            href="#contact" 
+            href="/#contact" 
             className="px-10 py-5 border border-white/30 hover:border-white text-white font-bold uppercase tracking-widest text-xs transition-all w-full md:w-auto"
           >
             Start a Project

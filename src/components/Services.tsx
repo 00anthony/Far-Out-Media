@@ -205,7 +205,7 @@ export default function Services() {
               </span>
             </a>
             <a
-              href="#contact"
+              href="/#contact"
               className="group relative px-10 py-4 bg-white text-black text-xs font-black uppercase tracking-[0.2em] overflow-hidden transition-all hover:scale-[1.02] active:scale-95"
             >
               <span className="absolute inset-0 bg-[#C2B280] -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]" />
