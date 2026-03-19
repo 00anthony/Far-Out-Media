@@ -37,16 +37,28 @@ const FEATURED_WORK_QUERY = `*[_type == "featuredWork"][0] {
   }
 }`;
 
+const ABOUT_QUERY = `*[_type == "about"][0] {
+  eyebrow,
+  headingFirst,
+  headingAccent,
+  accentColor,
+  paragraphs,
+  achievements[] { value, label },
+  "image":    image.asset->url,
+  imageAlt
+}`;
+
 export default async function Home() {
   const heroData: HeroData | null = await client.fetch(HERO_QUERY);
   const featuredWorkData = await client.fetch(FEATURED_WORK_QUERY);
+  const aboutData = await client.fetch(ABOUT_QUERY);
 
   return (
     <div className="min-h-screen bg-[#0E0E0E] text-white selection:bg-[#C2B280] selection:text-black">
       <main>
         <Hero data={heroData ?? undefined} />
         <FeaturedWork data={featuredWorkData ?? undefined} />
-        <About />
+        <About data={aboutData ?? undefined} />
         <Services />
         <WhyVideo />
         <Process />

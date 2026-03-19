@@ -17,6 +17,7 @@ import { navbar } from './src/sanity/schemaTypes/Navbar'
 import { hero } from './src/sanity/schemaTypes/Hero'
 import { featuredWork } from './src/sanity/schemaTypes/FeaturedWork'
 import { workProject } from './src/sanity/schemaTypes/workProject'
+import { about } from './src/sanity/schemaTypes/About'
 
 export default defineConfig({
   basePath: '/studio',
@@ -29,6 +30,7 @@ export default defineConfig({
     hero, 
     featuredWork,
     workProject,
+    about, 
     
   ]},
   plugins: [
