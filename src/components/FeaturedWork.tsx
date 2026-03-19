@@ -11,8 +11,8 @@ export interface WorkProject {
   category: string;
   thumbnail: string;
   thumbnailAlt: string;
-  slug: string;                    // builds href: /work/[slug]
-  previewVideoMp4?: string | null; // short silent hover clip
+  slug: string;
+  previewVideoMp4?: string | null;
   previewVideoWebm?: string | null;
 }
 
@@ -28,7 +28,7 @@ export interface FeaturedWorkData {
 }
 
 /* ─────────────────────────────────────────────────────────────────────
-   DEFAULTS — used when Sanity returns null / no data prop passed
+   DEFAULTS
 ───────────────────────────────────────────────────────────────────── */
 const DEFAULTS: FeaturedWorkData = {
   eyebrow: "Selected Works",
@@ -49,31 +49,8 @@ const DEFAULTS: FeaturedWorkData = {
   ],
 };
 
-/*
-  GROQ query — run in app/page.tsx (server component):
-  ─────────────────────────────────────────────────────
-  const FEATURED_WORK_QUERY = `*[_type == "featuredWork"][0] {
-    eyebrow, heading, subheading, accentColor,
-    ctaEyebrow, ctaLabel, ctaHref,
-    projects[]-> {
-      _id,
-      title,
-      category,
-      "thumbnail":        thumbnail.asset->url,
-      thumbnailAlt,
-      "slug":             slug.current,
-      "previewVideoMp4":  previewVideoMp4.asset->url,
-      "previewVideoWebm": previewVideoWebm.asset->url
-    }
-  }`;
-  const featuredWorkData = await sanityClient.fetch(FEATURED_WORK_QUERY);
-  // <FeaturedWork data={featuredWorkData ?? undefined} />
-*/
-
 /* ─────────────────────────────────────────────────────────────────────
-   PROJECT CARD
-   Isolated component so each card manages its own hover/video state
-   independently — hovering one card doesn't affect the others.
+   PROJECT CARD — shared between desktop grid and mobile scroll
 ───────────────────────────────────────────────────────────────────── */
 function ProjectCard({
   project,
@@ -89,27 +66,24 @@ function ProjectCard({
   const handleMouseEnter = () => {
     if (!videoRef.current) return;
     videoRef.current.currentTime = 0;
-    videoRef.current.play().catch(() => {
-      // Silently ignore — some browsers block muted autoplay on hover
-    });
+    videoRef.current.play().catch(() => {});
   };
 
   const handleMouseLeave = () => {
     if (!videoRef.current) return;
     videoRef.current.pause();
     videoRef.current.currentTime = 0;
-    // Reset ready state so next hover fades in cleanly
     setVideoReady(false);
   };
 
   return (
     <a
       href={`/work/${project.slug}`}
-      className="group relative aspect-3/4 overflow-hidden bg-zinc-900 cursor-pointer block"
+      className="group relative w-full h-full overflow-hidden bg-zinc-900 cursor-pointer block"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Thumbnail — always present, fades out when preview video plays */}
+      {/* Thumbnail */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={project.thumbnail}
@@ -121,8 +95,7 @@ function ProjectCard({
         }`}
       />
 
-      {/* Preview video — only rendered if a clip was uploaded in Sanity.
-          preload="none" means nothing downloads until the user hovers. */}
+      {/* Preview video */}
       {hasPreview && (
         <video
           ref={videoRef}
@@ -148,19 +121,19 @@ function ProjectCard({
       <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
 
       {/* Text */}
-      <div className="absolute bottom-0 left-0 p-8 w-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+      <div className="absolute bottom-0 left-0 p-6 md:p-8 w-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
         <span
           className="text-[10px] uppercase tracking-[0.3em] mb-2 block opacity-0 group-hover:opacity-100 transition-opacity duration-700"
           style={{ color: accentColor }}
         >
           {project.category}
         </span>
-        <h3 className="text-2xl font-bold tracking-tight">{project.title}</h3>
+        <h3 className="text-xl md:text-2xl font-bold tracking-tight">{project.title}</h3>
       </div>
 
       {/* Arrow */}
-      <div className="absolute top-8 right-8 w-12 h-12 rounded-full border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:rotate-45">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <div className="absolute top-6 right-6 md:top-8 md:right-8 w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:rotate-45">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
       </div>
@@ -174,12 +147,23 @@ function ProjectCard({
 export default function FeaturedWork({ data }: { data?: FeaturedWorkData | null }) {
   const d: FeaturedWorkData = data ?? DEFAULTS;
 
-  return (
-    <section id="work" className="py-32 bg-[#0E0E0E]">
-      <div className="container mx-auto px-6 md:px-12">
+  const scrollRef   = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = el.scrollWidth / d.projects.length;
+    const index = Math.round(el.scrollLeft / cardWidth);
+    setActiveIndex(Math.min(index, d.projects.length - 1));
+  };
+
+  return (
+    <section id="work" className="py-16 bg-[#0E0E0E]">
+
+      {/* Header */}
+      <div className="container mx-auto px-6 md:px-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
           <div>
             <span
               className="text-xs font-bold tracking-[0.3em] uppercase mb-4 block"
@@ -195,20 +179,85 @@ export default function FeaturedWork({ data }: { data?: FeaturedWorkData | null 
             {d.subheading}
           </p>
         </div>
+      </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* ════════════════════════════════════
+          DESKTOP — 3-column grid
+      ════════════════════════════════════ */}
+      <div className="container mx-auto px-6 md:px-12">
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {d.projects.map((project) => (
-            <ProjectCard
+            <div key={project._id} className="aspect-3/4">
+              <ProjectCard project={project} accentColor={d.accentColor} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ════════════════════════════════════
+          MOBILE — horizontal snap scroll
+          pl-6 aligns first card with the rest
+          of the page; no pr so next card peeks
+      ════════════════════════════════════ */}
+      <div className="md:hidden">
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex gap-4 overflow-x-auto pl-6 snap-x snap-mandatory"
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            WebkitOverflowScrolling: "touch",
+          }}
+        >
+          {d.projects.map((project) => (
+            // 80vw — fills most of the screen so the next card peeks right
+            <div
               key={project._id}
-              project={project}
-              accentColor={d.accentColor}
+              className="snap-start shrink-0 w-[80vw]"
+              style={{ aspectRatio: "3/4" }}
+            >
+              <ProjectCard project={project} accentColor={d.accentColor} />
+            </div>
+          ))}
+
+          {/* Trailing spacer so the last card can fully snap into place */}
+          <div className="shrink-0 w-6" aria-hidden />
+        </div>
+
+        {/* Dot indicators */}
+        <div className="flex items-center justify-center gap-2 mt-6 px-6">
+          {d.projects.map((_, i) => (
+            <button
+              key={i}
+              aria-label={`Go to project ${i + 1}`}
+              onClick={() => {
+                const el = scrollRef.current;
+                if (!el) return;
+                const cardWidth = el.scrollWidth / d.projects.length;
+                el.scrollTo({ left: cardWidth * i, behavior: "smooth" });
+                setActiveIndex(i);
+              }}
+              className="rounded-full transition-all duration-300"
+              style={{
+                width:  i === activeIndex ? 24 : 6,
+                height: 6,
+                background: i === activeIndex
+                  ? d.accentColor
+                  : "rgba(255,255,255,0.15)",
+              }}
             />
           ))}
         </div>
 
-        {/* CTA */}
-        <div className="mt-20 text-center">
+        <p className="text-center mt-4 text-[10px] tracking-[0.35em] uppercase text-zinc-700">
+          Swipe to explore
+        </p>
+      </div>
+
+      {/* CTA */}
+      <div className="container mx-auto px-6 md:px-12">
+        <div className="mt-16 text-center">
           <span
             className="text-[10px] uppercase tracking-[0.5em] mb-2 block"
             style={{ color: d.accentColor }}

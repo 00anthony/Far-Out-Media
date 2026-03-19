@@ -1,17 +1,17 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 
 /* ─────────────────────────────────────────────────────────────────────
-   TYPES — condensed subset of the full servicePackage schema
+   TYPES
 ───────────────────────────────────────────────────────────────────── */
 export interface ServiceCardData {
   _id: string;
   title: string;
   category: "video-marketing" | "aerial-marketing";
   description: string;
-  bullets: string[];      // first 4 deliverable labels pulled from Sanity
+  bullets: string[];
   featured?: boolean;
   order: number;
 }
@@ -53,8 +53,7 @@ const DEFAULTS: ServicesData = {
 };
 
 /* ─────────────────────────────────────────────────────────────────────
-   ICON MAP — keyed by package title so icons survive Sanity round-trips.
-   If you rename a package in Studio, add the new title here.
+   ICON MAP
 ───────────────────────────────────────────────────────────────────── */
 const ICONS: Record<string, React.ReactNode> = {
   Essentials: (
@@ -100,7 +99,162 @@ const OFFSETS = [0, 40, 80];
 const ease = [0.16, 1, 0.3, 1] as const;
 
 /* ─────────────────────────────────────────────────────────────────────
-   COMPONENT
+   MOBILE SCROLL ROW
+   Each category gets its own independent scroll track + dot indicators.
+───────────────────────────────────────────────────────────────────── */
+function MobileScrollRow({
+  packages,
+  accentColor,
+  categoryLabel,
+}: {
+  packages: ServiceCardData[];
+  accentColor: string;
+  categoryLabel: string;
+}) {
+  const scrollRef    = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = el.scrollWidth / packages.length;
+    setActive(Math.min(Math.round(el.scrollLeft / cardWidth), packages.length - 1));
+  };
+
+  return (
+    <div className="mb-10">
+      {/* Category label */}
+      <div className="flex items-center gap-3 mb-5 px-6">
+        <div className="h-px w-6 bg-[#657886]/60" />
+        <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-[#657886]">
+          {categoryLabel}
+        </span>
+      </div>
+
+      {/* Scroll track — pl-6 aligns with the rest of the page, no pr so next card peeks */}
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex gap-4 overflow-x-auto pl-6 snap-x snap-mandatory"
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
+        {packages.map((pkg) => (
+          <div
+            key={pkg._id}
+            // 82vw gives enough room for the card content while
+            // keeping the next card visibly peeking from the right
+            className="snap-start shrink-0 w-[82vw]"
+          >
+            <MobileServiceCard service={pkg} accentColor={accentColor} />
+          </div>
+        ))}
+        {/* Trailing spacer so the last card can fully snap */}
+        <div className="shrink-0 w-6" aria-hidden />
+      </div>
+
+      {/* Dot indicators */}
+      <div className="flex items-center justify-center gap-2 mt-5 px-6">
+        {packages.map((_, i) => (
+          <button
+            key={i}
+            aria-label={`Go to package ${i + 1}`}
+            onClick={() => {
+              const el = scrollRef.current;
+              if (!el) return;
+              const cardWidth = el.scrollWidth / packages.length;
+              el.scrollTo({ left: cardWidth * i, behavior: "smooth" });
+              setActive(i);
+            }}
+            className="rounded-full transition-all duration-300"
+            style={{
+              width:  i === active ? 24 : 6,
+              height: 6,
+              background: i === active ? accentColor : "rgba(255,255,255,0.15)",
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   MOBILE SERVICE CARD
+   No marginTop stagger — that's a desktop-only visual.
+───────────────────────────────────────────────────────────────────── */
+function MobileServiceCard({
+  service,
+  accentColor,
+}: {
+  service: ServiceCardData;
+  accentColor: string;
+}) {
+  const icon = ICONS[service.title] ?? FALLBACK_ICON;
+
+  return (
+    <div className="group relative flex flex-col border border-white/6 bg-black h-full">
+      {service.featured && (
+        <div className="absolute -top-px left-6">
+          <span
+            className="inline-block text-black text-[9px] font-black tracking-[0.3em] uppercase px-3 py-1"
+            style={{ background: accentColor }}
+          >
+            Most Popular
+          </span>
+        </div>
+      )}
+
+      <div className="p-7 flex flex-col flex-1">
+        <div
+          className="mb-5 w-10 h-10 flex items-center justify-center border border-white/10 shrink-0"
+          style={{ color: accentColor }}
+        >
+          {icon}
+        </div>
+
+        <h3 className="text-lg font-black tracking-tight mb-2 text-white">
+          {service.title}
+        </h3>
+
+        <p className="text-zinc-500 text-sm leading-relaxed mb-5">
+          {service.description}
+        </p>
+
+        <div className="h-px bg-white/5 mb-5" />
+
+        <ul className="space-y-2 mb-6 flex-1">
+          {service.bullets.map((b, i) => (
+            <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-500">
+              <span
+                className="mt-1 w-1 h-1 rounded-full shrink-0"
+                style={{ background: `${accentColor}99` }}
+              />
+              {b}
+            </li>
+          ))}
+        </ul>
+
+        <a
+          href="/services"
+          className="mt-auto flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase transition-colors duration-300"
+          style={{ color: `${accentColor}70` }}
+        >
+          See Details
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   SECTION
 ───────────────────────────────────────────────────────────────────── */
 export default function Services({ data }: { data?: ServicesData | null }) {
   const d: ServicesData = data ?? DEFAULTS;
@@ -119,7 +273,7 @@ export default function Services({ data }: { data?: ServicesData | null }) {
   const ctaInView    = useInView(ctaRef,    { once: true, margin: "-40px" });
 
   return (
-    <section id="services" className="relative py-36 bg-zinc-950 overflow-hidden">
+    <section id="services" className="relative py-18 bg-zinc-950 overflow-hidden">
       {/* Ambient glows */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-0 left-1/4 w-125 h-125 bg-[#C2B280]/5 rounded-full blur-[130px]" />
@@ -135,26 +289,22 @@ export default function Services({ data }: { data?: ServicesData | null }) {
         }}
       />
 
+      {/* ── Header ── */}
       <div className="container mx-auto px-6 md:px-12 relative z-10">
-
-        {/* ── Header ── */}
         <motion.div
           ref={headerRef}
           initial={{ opacity: 0, y: 24 }}
           animate={headerInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, ease }}
-          className="mb-24"
+          className="mb-16 md:mb-24"
         >
           <div className="flex items-center gap-4 mb-6">
             <div className="h-px w-10" style={{ background: `${d.accentColor}80` }} />
-            <span
-              className="text-[10px] font-bold tracking-[0.5em] uppercase"
-              style={{ color: d.accentColor }}
-            >
+            <span className="text-[10px] font-bold tracking-[0.5em] uppercase" style={{ color: d.accentColor }}>
               {d.eyebrow}
             </span>
           </div>
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+          <div className="flex flex-col gap-6">
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none">
               {d.headingFirst}
               <br />
@@ -162,23 +312,43 @@ export default function Services({ data }: { data?: ServicesData | null }) {
                 {d.headingAccent}
               </span>
             </h2>
-            <p className="text-zinc-500 text-sm leading-relaxed max-w-xs md:text-right">
+            <p className="text-zinc-500 text-sm">
               {d.subheading}
             </p>
           </div>
         </motion.div>
+      </div>
 
-        {/* ── Row 1: Video Marketing ── */}
+      {/* ════════════════════════════════════
+          MOBILE — two independent scroll rows
+          (hidden on desktop via md:hidden)
+      ════════════════════════════════════ */}
+      <div className="md:hidden relative z-10">
+        {videoPackages.length > 0 && (
+          <MobileScrollRow
+            packages={videoPackages}
+            accentColor={d.accentColor}
+            categoryLabel="Video Marketing · Full-Service"
+          />
+        )}
+        {aerialPackages.length > 0 && (
+          <MobileScrollRow
+            packages={aerialPackages}
+            accentColor={d.accentColor}
+            categoryLabel="Aerial Marketing · Drone-Only"
+          />
+        )}
+      </div>
+
+      {/* ════════════════════════════════════
+          DESKTOP — two staggered grid rows
+          (hidden on mobile via hidden md:block)
+      ════════════════════════════════════ */}
+      <div className="hidden md:block container mx-auto px-6 md:px-12 relative z-10">
         {videoPackages.length > 0 && (
           <>
-            <CategoryLabel
-              label="Video Marketing · Full-Service"
-              inView={row1InView}
-            />
-            <div
-              ref={row1Ref}
-              className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 md:items-start"
-            >
+            <CategoryLabel label="Video Marketing · Full-Service" inView={row1InView} />
+            <div ref={row1Ref} className="grid grid-cols-3 gap-6 mb-6 items-start">
               {videoPackages.map((pkg, i) => (
                 <ServiceCard
                   key={pkg._id}
@@ -193,18 +363,10 @@ export default function Services({ data }: { data?: ServicesData | null }) {
           </>
         )}
 
-        {/* ── Row 2: Aerial Marketing ── */}
         {aerialPackages.length > 0 && (
           <>
-            <CategoryLabel
-              label="Aerial Marketing · Drone-Only"
-              inView={row2InView}
-              delay={0.1}
-            />
-            <div
-              ref={row2Ref}
-              className="grid grid-cols-1 md:grid-cols-3 gap-6"
-            >
+            <CategoryLabel label="Aerial Marketing · Drone-Only" inView={row2InView} delay={0.1} />
+            <div ref={row2Ref} className="grid grid-cols-3 gap-6">
               {aerialPackages.map((pkg, i) => (
                 <ServiceCard
                   key={pkg._id}
@@ -218,14 +380,16 @@ export default function Services({ data }: { data?: ServicesData | null }) {
             </div>
           </>
         )}
+      </div>
 
-        {/* ── CTA ── */}
+      {/* ── CTA ── */}
+      <div className="container mx-auto px-6 md:px-12 relative z-10">
         <motion.div
           ref={ctaRef}
           initial={{ opacity: 0, y: 24 }}
           animate={ctaInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.2, ease }}
-          className="mt-20 flex flex-col items-center gap-6 text-center"
+          className="mt-16 md:mt-20 flex flex-col items-center gap-6 text-center"
         >
           <p className="text-zinc-500 text-sm max-w-sm">{d.ctaText}</p>
           <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -256,22 +420,13 @@ export default function Services({ data }: { data?: ServicesData | null }) {
             </a>
           </div>
         </motion.div>
-
       </div>
     </section>
   );
 }
 
-/* ─── CategoryLabel ──────────────────────────────────────────────────── */
-function CategoryLabel({
-  label,
-  inView,
-  delay = 0,
-}: {
-  label: string;
-  inView: boolean;
-  delay?: number;
-}) {
+/* ─── CategoryLabel — desktop only ──────────────────────────────────── */
+function CategoryLabel({ label, inView, delay = 0 }: { label: string; inView: boolean; delay?: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -16 }}
@@ -280,26 +435,14 @@ function CategoryLabel({
       className="flex items-center gap-3 mb-5"
     >
       <div className="h-px w-6 bg-[#657886]/60" />
-      <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-[#657886]">
-        {label}
-      </span>
+      <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-[#657886]">{label}</span>
     </motion.div>
   );
 }
 
-/* ─── ServiceCard ────────────────────────────────────────────────────── */
-function ServiceCard({
-  service,
-  index,
-  offsetY,
-  inView,
-  accentColor,
-}: {
-  service: ServiceCardData;
-  index: number;
-  offsetY: number;
-  inView: boolean;
-  accentColor: string;
+/* ─── ServiceCard — desktop only ────────────────────────────────────── */
+function ServiceCard({ service, index, offsetY, inView, accentColor }: {
+  service: ServiceCardData; index: number; offsetY: number; inView: boolean; accentColor: string;
 }) {
   const icon = ICONS[service.title] ?? FALLBACK_ICON;
 
@@ -307,31 +450,21 @@ function ServiceCard({
     <motion.div
       initial={{ opacity: 0, y: 40 + offsetY * 0.5 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{
-        duration: 0.75,
-        delay: index * 0.1,
-        ease: [0.16, 1, 0.3, 1] as const,
-      }}
+      transition={{ duration: 0.75, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] as const }}
       style={{ marginTop: offsetY }}
       className="group relative flex flex-col border border-white/6 bg-black hover:border-[#C2B280]/30 transition-colors duration-500"
     >
-      {/* Featured badge */}
       {service.featured && (
         <div className="absolute -top-px left-6">
-          <span
-            className="inline-block text-black text-[9px] font-black tracking-[0.3em] uppercase px-3 py-1"
-            style={{ background: accentColor }}
-          >
+          <span className="inline-block text-black text-[9px] font-black tracking-[0.3em] uppercase px-3 py-1" style={{ background: accentColor }}>
             Most Popular
           </span>
         </div>
       )}
 
-      {/* Top accent line on hover */}
       <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-[#C2B280]/0 to-transparent group-hover:via-[#C2B280]/60 transition-all duration-700" />
 
       <div className="p-8 flex flex-col flex-1">
-        {/* Icon */}
         <div
           className="mb-6 w-10 h-10 flex items-center justify-center border border-white/10 group-hover:border-[#C2B280]/40 transition-colors group-hover:-translate-y-1 transform duration-500"
           style={{ color: accentColor }}
@@ -339,44 +472,22 @@ function ServiceCard({
           {icon}
         </div>
 
-        {/* Title */}
-        <h3 className="text-xl font-black tracking-tight mb-3 text-white">
-          {service.title}
-        </h3>
-
-        {/* Description — uses tagline from Sanity */}
-        <p className="text-zinc-500 text-sm leading-relaxed mb-6">
-          {service.description}
-        </p>
-
-        {/* Divider */}
+        <h3 className="text-xl font-black tracking-tight mb-3 text-white">{service.title}</h3>
+        <p className="text-zinc-500 text-sm leading-relaxed mb-6">{service.description}</p>
         <div className="h-px bg-white/5 mb-6" />
 
-        {/* Bullets — first 4 deliverable labels from Sanity */}
         <ul className="space-y-2 mb-8 flex-1">
           {service.bullets.map((b, i) => (
             <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-500">
-              <span
-                className="mt-1 w-1 h-1 rounded-full shrink-0"
-                style={{ background: `${accentColor}99` }}
-              />
+              <span className="mt-1 w-1 h-1 rounded-full shrink-0" style={{ background: `${accentColor}99` }} />
               {b}
             </li>
           ))}
         </ul>
 
-        {/* CTA */}
-        <a
-          href="/services"
-          className="mt-auto flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase text-white/30 group-hover:text-[#C2B280] transition-colors duration-300"
-        >
+        <a href="/services" className="mt-auto flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase text-white/30 group-hover:text-[#C2B280] transition-colors duration-300">
           See Details
-          <svg
-            className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
         </a>
