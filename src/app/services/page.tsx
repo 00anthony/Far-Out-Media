@@ -7,7 +7,6 @@
 import { client } from "../../sanity/lib/client";
 import ServicesClient from "./ServicesClient"; // we split the interactive UI out
 import { Package } from "./types";
-import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/Footer";
 
 /* ─────────────────────────────────────────────────────────────────────
@@ -80,7 +79,6 @@ export default async function ServicesPage() {
   // Pass the fetched data down to the interactive Client Component
   return (
     <>
-      <Navbar />
       <ServicesClient packages={packages} />
       <Footer />
     </>

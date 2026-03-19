@@ -1,6 +1,5 @@
 
 import Hero from '../components/Hero';
-import Navbar from '../components/Navbar';
 import FeaturedWork from '../components/FeaturedWork';
 import About from '../components/About';
 import Services from '../components/Services';
@@ -14,7 +13,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0E0E0E] text-white selection:bg-[#C2B280] selection:text-black">
-      <Navbar />
       <main>
         <Hero />
         <FeaturedWork />
