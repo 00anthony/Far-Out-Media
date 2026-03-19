@@ -10,7 +10,6 @@ import {structureTool} from 'sanity/structure'
 
 // Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
 import {apiVersion, dataset, projectId} from './src/sanity/env'
-import {schema} from './src/sanity/schemaTypes'
 import {structure} from './src/sanity/structure'
 import { servicePackage } from './src/sanity/schemaTypes/servicePackage'
 import { navbar } from './src/sanity/schemaTypes/Navbar'
@@ -23,6 +22,7 @@ import { process } from './src/sanity/schemaTypes/Process'
 import { testimonials } from './src/sanity/schemaTypes/Testimonials'
 import { contactSection } from './src/sanity/schemaTypes/Contactsection'
 import { footer } from './src/sanity/schemaTypes/Footer'
+import { homepage } from './src/sanity/schemaTypes/Homepage'
 
 export default defineConfig({
   basePath: '/studio',
@@ -41,6 +41,7 @@ export default defineConfig({
     testimonials, 
     contactSection, 
     footer, 
+    homepage,
   ]},
   plugins: [
     structureTool({structure}),

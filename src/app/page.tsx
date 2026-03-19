@@ -1,14 +1,71 @@
+// app/page.tsx
+import { client } from "@/src/sanity/lib/client";
 
-import { client } from '../sanity/lib/client';
-import Hero from '../components/Hero';
-import type { HeroData } from '../components/Hero';
-import FeaturedWork from '../components/FeaturedWork';
-import About from '../components/About';
-import Services from '../components/Services';
-import Benefits from '../components/Benefits';
-import Process from '../components/Process';
-import Testimonials from '../components/Testimonials';
-import ContactSection from '../components/ContactSection';
+// Section components
+import Hero           from "@/src/components/Hero";
+import FeaturedWork   from "@/src/components/FeaturedWork";
+import Services       from "@/src/components/Services";
+import About          from "@/src/components/About";
+import Benefits       from "@/src/components/Benefits";
+import Process        from "@/src/components/Process";
+import Testimonials   from "@/src/components/Testimonials";
+import ContactSection from "@/src/components/ContactSection";
+
+// Types
+import type { HeroData }            from "@/src/components/Hero";
+import type { FeaturedWorkData }    from "@/src/components/FeaturedWork";
+import type { ServicesData }        from "@/src/components/Services";
+import type { AboutData }           from "@/src/components/About";
+import type { BenefitsData }        from "@/src/components/Benefits";
+import type { ProcessData }         from "@/src/components/Process";
+import type { TestimonialsData }    from "@/src/components/Testimonials";
+import type { ContactSectionData }  from "@/src/components/ContactSection";
+
+/* ─────────────────────────────────────────────────────────────────────
+   REVALIDATION
+   Change to 0 while actively editing in Studio.
+───────────────────────────────────────────────────────────────────── */
+export const revalidate = 3600;
+
+/* ─────────────────────────────────────────────────────────────────────
+   TYPES
+   SectionKey must stay in sync with the `section` option values
+   in schemas/homepage.ts
+───────────────────────────────────────────────────────────────────── */
+type SectionKey =
+  | "featuredWork"
+  | "services"
+  | "about"
+  | "benefits"
+  | "process"
+  | "testimonials"
+  | "contact";
+
+interface SectionOrderItem {
+  section: SectionKey;
+  visible: boolean;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   DEFAULT ORDER
+   Used when the homepage Sanity document hasn't been created yet.
+───────────────────────────────────────────────────────────────────── */
+const DEFAULT_ORDER: SectionOrderItem[] = [
+  { section: "featuredWork",  visible: true },
+  { section: "services",      visible: true },
+  { section: "about",         visible: true },
+  { section: "benefits",      visible: true },
+  { section: "process",       visible: true },
+  { section: "testimonials",  visible: true },
+  { section: "contact",       visible: true },
+];
+
+/* ─────────────────────────────────────────────────────────────────────
+   GROQ QUERIES
+───────────────────────────────────────────────────────────────────── */
+const HOMEPAGE_ORDER_QUERY = `*[_type == "homepage"][0] {
+  sectionOrder[] { section, visible }
+}`;
 
 const HERO_QUERY = `*[_type == "hero"][0] {
   eyebrow, headingFirst, headingAccent,
@@ -25,9 +82,7 @@ const FEATURED_WORK_QUERY = `*[_type == "featuredWork"][0] {
   eyebrow, heading, subheading, accentColor,
   ctaEyebrow, ctaLabel, ctaHref,
   projects[]-> {
-    _id,
-    title,
-    category,
+    _id, title, category,
     "thumbnail":        thumbnail.asset->url,
     thumbnailAlt,
     "slug":             slug.current,
@@ -36,35 +91,25 @@ const FEATURED_WORK_QUERY = `*[_type == "featuredWork"][0] {
   }
 }`;
 
+const SERVICES_HOME_QUERY = `*[_type == "servicePackage"] | order(order asc) {
+  _id, title, category,
+  "description": tagline,
+  "bullets": deliverables[0..3][].label,
+  featured, order
+}`;
+
 const ABOUT_QUERY = `*[_type == "about"][0] {
-  eyebrow,
-  headingFirst,
-  headingAccent,
-  accentColor,
+  eyebrow, headingFirst, headingAccent, accentColor,
   paragraphs,
   achievements[] { value, label },
-  "image":    image.asset->url,
+  "image": image.asset->url,
   imageAlt
 }`;
 
-const SERVICES_HOME_QUERY = `*[_type == "servicePackage"] | order(order asc) {
-  _id,
-  title,
-  category,
-  "description": tagline,
-  "bullets": deliverables[0..3][].label,
-  featured,
-  order
-}`;
-
 const BENEFITS_QUERY = `*[_type == "benefits"][0] {
-  eyebrow,
-  headingFirst,
-  headingAccent,
-  accentColor,
+  eyebrow, headingFirst, headingAccent, accentColor,
   benefits[] { value, body },
-  calloutHeading,
-  calloutQuote
+  calloutHeading, calloutQuote
 }`;
 
 const PROCESS_QUERY = `*[_type == "process"][0] {
@@ -73,8 +118,7 @@ const PROCESS_QUERY = `*[_type == "process"][0] {
 }`;
 
 const TESTIMONIALS_QUERY = `*[_type == "testimonials"][0] {
-  eyebrow,
-  accentColor,
+  eyebrow, accentColor,
   testimonials[] { quote, name, title, initials }
 }`;
 
@@ -82,47 +126,92 @@ const CONTACT_QUERY = `*[_type == "contactSection"][0] {
   eyebrow, headingFirst, headingAccent, accentColor, subheading,
   projectTypes,
   formFields[] { name, label, type, required, colSpan },
-  submitLabel,
-  successHeading, successBody, successFooter,
+  submitLabel, successHeading, successBody, successFooter,
   footerLeft, footerRight
 }`;
 
-export default async function Home() {
-  const heroData: HeroData | null = await client.fetch(HERO_QUERY);
-  const featuredWorkData = await client.fetch(FEATURED_WORK_QUERY);
-  const aboutData = await client.fetch(ABOUT_QUERY);
-  const packagesData = await client.fetch(SERVICES_HOME_QUERY);
-  const benefitsData = await client.fetch(BENEFITS_QUERY);
-  const processData = await client.fetch(PROCESS_QUERY);
-  const testimonialsData = await client.fetch(TESTIMONIALS_QUERY);
-  const contactData = await client.fetch(CONTACT_QUERY);
+/* ─────────────────────────────────────────────────────────────────────
+   PAGE
+───────────────────────────────────────────────────────────────────── */
+export default async function HomePage() {
+  // All data fetched in parallel — single Sanity round-trip
+  const [
+    homepageData,
+    heroData,
+    featuredWorkData,
+    packagesData,
+    aboutData,
+    benefitsData,
+    processData,
+    testimonialsData,
+    contactData,
+  ] = await Promise.all([
+    client.fetch<{ sectionOrder: SectionOrderItem[] } | null>(HOMEPAGE_ORDER_QUERY),
+    client.fetch<HeroData | null>(HERO_QUERY),
+    client.fetch<FeaturedWorkData | null>(FEATURED_WORK_QUERY),
+    client.fetch<ServicesData["packages"] | null>(SERVICES_HOME_QUERY),
+    client.fetch<AboutData | null>(ABOUT_QUERY),
+    client.fetch<BenefitsData | null>(BENEFITS_QUERY),
+    client.fetch<ProcessData | null>(PROCESS_QUERY),
+    client.fetch<TestimonialsData | null>(TESTIMONIALS_QUERY),
+    client.fetch<ContactSectionData | null>(CONTACT_QUERY),
+  ]);
+
+  // Resolve section order — fall back to default if doc not created yet
+  const sectionOrder = homepageData?.sectionOrder ?? DEFAULT_ORDER;
+
+  // Filter to only visible sections
+  const visibleSections = sectionOrder.filter((s) => s.visible !== false);
+
+  // Assemble ServicesData from the packages array + static section copy.
+  // If you want the section text editable in Sanity too, create a
+  // `servicesSection` singleton and merge it here.
+  const servicesData: ServicesData | null = packagesData
+    ? {
+        eyebrow: "Our Packages",
+        headingFirst: "Services &",
+        headingAccent: "Packages",
+        subheading: "Every package is built around your goals — from a single shoot to a full brand content suite.",
+        accentColor: "#C2B280",
+        ctaText: "Need something custom? Every project is different — let's build the right package for you.",
+        ctaHref: "/services",
+        ctaPrimaryLabel: "Get a Free Quote",
+        ctaPrimaryHref: "/#contact",
+        packages: packagesData,
+      }
+    : null;
+
+  /* ─── SECTION MAP ─────────────────────────────────────────────────
+     Maps each SectionKey → its rendered JSX.
+
+     To add a new section later:
+       1. Build the component + Sanity schema
+       2. Add its key to SectionKey type above
+       3. Add it to SECTION_OPTIONS in schemas/homepage.ts
+       4. Add its GROQ query and fetch above
+       5. Add it to SECTION_MAP here
+  ─────────────────────────────────────────────────────────────────── */
+  const SECTION_MAP: Record<SectionKey, React.ReactNode> = {
+    featuredWork:  <FeaturedWork  data={featuredWorkData  ?? undefined} />,
+    services:      <Services      data={servicesData      ?? undefined} />,
+    about:         <About         data={aboutData         ?? undefined} />,
+    benefits:      <Benefits      data={benefitsData      ?? undefined} />,
+    process:       <Process       data={processData       ?? undefined} />,
+    testimonials:  <Testimonials  data={testimonialsData  ?? undefined} />,
+    contact:       <ContactSection data={contactData      ?? undefined} />,
+  };
 
   return (
-    <div className="min-h-screen bg-[#0E0E0E] text-white selection:bg-[#C2B280] selection:text-black">
-      <main>
-        <Hero data={heroData ?? undefined} />
-        <FeaturedWork data={featuredWorkData ?? undefined} />
-        <About data={aboutData ?? undefined} />
-        <Services
-          data={{
-            eyebrow: "Our Packages",
-            headingFirst: "Services &",
-            headingAccent: "Packages",
-            subheading: "Every package is built around your goals — from a single shoot to a full brand content suite.",
-            accentColor: "#C2B280",
-            ctaText: "Need something custom? Every project is different — let's build the right package for you.",
-            ctaHref: "/services",
-            ctaPrimaryLabel: "Get a Free Quote",
-            ctaPrimaryHref: "/#contact",
-            packages: packagesData ?? [],
-          }}
-        />
-        <Benefits data={benefitsData ?? undefined} />
-        <Process data={processData ?? undefined} />
-        <Testimonials data={testimonialsData ?? undefined} />
-        <ContactSection data={contactData ?? undefined} />
-      </main>
-    </div>
+    <main>
+      {/* Hero is always first and is not reorderable */}
+      <Hero data={heroData ?? undefined} />
+
+      {/* Render sections in Studio-defined order, skip any unknown keys */}
+      {visibleSections.map(({ section }) => {
+        const node = SECTION_MAP[section];
+        if (!node) return null;
+        return <div key={section}>{node}</div>;
+      })}
+    </main>
   );
 }
-

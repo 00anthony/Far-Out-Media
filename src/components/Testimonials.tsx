@@ -21,16 +21,6 @@ export interface TestimonialsData {
 
 /* ─────────────────────────────────────────────────────────────────────
    DEFAULTS
-
-   GROQ query — add to app/page.tsx:
-   ──────────────────────────────────
-   const TESTIMONIALS_QUERY = `*[_type == "testimonials"][0] {
-     eyebrow,
-     accentColor,
-     testimonials[] { quote, name, title, initials }
-   }`;
-   const testimonialsData = await sanityClient.fetch(TESTIMONIALS_QUERY);
-   // <Testimonials data={testimonialsData ?? undefined} />
 ───────────────────────────────────────────────────────────────────── */
 const DEFAULTS: TestimonialsData = {
   eyebrow: "Client Stories",

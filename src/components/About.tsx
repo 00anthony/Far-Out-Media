@@ -21,22 +21,6 @@ export interface AboutData {
 
 /* ─────────────────────────────────────────────────────────────────────
    DEFAULTS
-   Used when Sanity returns null or no data prop is passed.
-
-   GROQ query — run in app/page.tsx (server component):
-   ──────────────────────────────────────────────────────
-   const ABOUT_QUERY = `*[_type == "about"][0] {
-     eyebrow,
-     headingFirst,
-     headingAccent,
-     accentColor,
-     paragraphs,
-     achievements[] { value, label },
-     "image":    image.asset->url,
-     imageAlt
-   }`;
-   const aboutData = await sanityClient.fetch(ABOUT_QUERY);
-   // Then: <About data={aboutData ?? undefined} />
 ───────────────────────────────────────────────────────────────────── */
 const DEFAULTS: AboutData = {
   eyebrow: "Our Philosophy",

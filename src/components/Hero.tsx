@@ -28,27 +28,6 @@ export interface HeroData {
 
 /* ─────────────────────────────────────────────────────────────────────
    DEFAULTS
-   Used when Sanity returns null (document not yet created) or when the
-   component is rendered without a data prop.
-
-   GROQ query — run in your page.tsx or layout.tsx server component:
-   ──────────────────────────────────────────────────────────────────
-   const HERO_QUERY = `*[_type == "hero"][0] {
-     eyebrow,
-     headingFirst,
-     headingAccent,
-     accentColorFrom,
-     accentColorTo,
-     primaryAccentColor,
-     subheading,
-     buttons[] { label, href, style },
-     "videoWebm": videoWebm.asset->url,
-     "videoMp4":  videoMp4.asset->url,
-     "poster":    poster.asset->url,
-     videoOpacity
-   }`;
-   const heroData = await sanityClient.fetch(HERO_QUERY);
-   // Then pass to the component:  <Hero data={heroData ?? undefined} />
 ───────────────────────────────────────────────────────────────────── */
 const DEFAULTS: HeroData = {
   eyebrow: "Charlotte based cinematic studio",
