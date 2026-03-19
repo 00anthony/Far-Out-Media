@@ -73,10 +73,10 @@ export default function Hero() {
           // Replace with your actual poster/hero image.
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src="/images/hero-poster.png"
+            src="/hero/hero-poster.png"
             alt=""
             aria-hidden="true"
-            className="bg-fixed w-full h-full object-cover scale-105 opacity-60"
+            className="bg-fixed w-full h-full object-cover scale-105 opacity-80"
           />
         )}
 
