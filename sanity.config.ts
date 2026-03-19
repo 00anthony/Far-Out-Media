@@ -14,13 +14,14 @@ import {schema} from './src/sanity/schemaTypes'
 import {structure} from './src/sanity/structure'
 import { servicePackage } from './src/sanity/schemaTypes/servicePackage'
 import { navbar } from './src/sanity/schemaTypes/Navbar'
+import { hero } from './src/sanity/schemaTypes/Hero'
 
 export default defineConfig({
   basePath: '/studio',
   projectId,
   dataset,
   // Add and edit the content schema in the './sanity/schemaTypes' folder
-  schema: { types: [servicePackage, navbar]},
+  schema: { types: [servicePackage, navbar, hero]},
   plugins: [
     structureTool({structure}),
     // Vision is for querying with GROQ from inside the Studio
