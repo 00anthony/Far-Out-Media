@@ -73,6 +73,12 @@ const PROCESS_QUERY = `*[_type == "process"][0] {
   steps[] { id, title, desc }
 }`;
 
+const TESTIMONIALS_QUERY = `*[_type == "testimonials"][0] {
+  eyebrow,
+  accentColor,
+  testimonials[] { quote, name, title, initials }
+}`;
+
 export default async function Home() {
   const heroData: HeroData | null = await client.fetch(HERO_QUERY);
   const featuredWorkData = await client.fetch(FEATURED_WORK_QUERY);
@@ -80,6 +86,7 @@ export default async function Home() {
   const packagesData = await client.fetch(SERVICES_HOME_QUERY);
   const benefitsData = await client.fetch(BENEFITS_QUERY);
   const processData = await client.fetch(PROCESS_QUERY);
+  const testimonialsData = await client.fetch(TESTIMONIALS_QUERY);
 
   return (
     <div className="min-h-screen bg-[#0E0E0E] text-white selection:bg-[#C2B280] selection:text-black">
@@ -103,7 +110,7 @@ export default async function Home() {
         />
         <Benefits data={benefitsData ?? undefined} />
         <Process data={processData ?? undefined} />
-        <Testimonials />
+        <Testimonials data={testimonialsData ?? undefined} />
         <ContactSection />
       </main>
       <Footer />

@@ -1,87 +1,99 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
 
-const TESTIMONIALS = [
-  {
-    quote:
-      "Far Out Media captured the soul of our brand. The cinematic quality they delivered surpassed our expectations and completely transformed our digital footprint.",
-    name: "Jameson Reed",
-    title: "CEO, Altitude Outdoor",
-    initials: "JR",
-  },
-  {
-    quote:
-      "From the first drone shot to the final edit, every frame told our story. We saw a 3× increase in social engagement within a week of launching the video.",
-    name: "Sofia Marchetti",
-    title: "Marketing Director, Vela Hospitality",
-    initials: "SM",
-  },
-  {
-    quote:
-      "They handled everything — planning, shooting, editing — and delivered ahead of schedule. The result felt like a Super Bowl commercial on an indie budget.",
-    name: "Derek Calloway",
-    title: "Founder, Ironside Fitness",
-    initials: "DC",
-  },
-];
+/* ─────────────────────────────────────────────────────────────────────
+   TYPES
+───────────────────────────────────────────────────────────────────── */
+export interface Testimonial {
+  quote: string;
+  name: string;
+  title: string;
+  initials: string;
+}
 
-const AUTOPLAY_MS = 6000;
+export interface TestimonialsData {
+  eyebrow: string;
+  accentColor: string;
+  testimonials: Testimonial[];
+}
 
-export default function Testimonials() {
-  const [active, setActive] = useState(0);
-  const [direction, setDirection] = useState(1); // 1 = forward, -1 = back
-  const [paused, setPaused] = useState(false);
+/* ─────────────────────────────────────────────────────────────────────
+   DEFAULTS
 
-  const go = useCallback(
-    (index: number) => {
-      setDirection(index > active ? 1 : -1);
-      setActive(index);
+   GROQ query — add to app/page.tsx:
+   ──────────────────────────────────
+   const TESTIMONIALS_QUERY = `*[_type == "testimonials"][0] {
+     eyebrow,
+     accentColor,
+     testimonials[] { quote, name, title, initials }
+   }`;
+   const testimonialsData = await sanityClient.fetch(TESTIMONIALS_QUERY);
+   // <Testimonials data={testimonialsData ?? undefined} />
+───────────────────────────────────────────────────────────────────── */
+const DEFAULTS: TestimonialsData = {
+  eyebrow: "Client Stories",
+  accentColor: "#C2B280",
+  testimonials: [
+    {
+      quote: "Far Out Media captured the soul of our brand. The cinematic quality they delivered surpassed our expectations and completely transformed our digital footprint.",
+      name: "Jameson Reed",
+      title: "CEO, Altitude Outdoor",
+      initials: "JR",
     },
-    [active]
-  );
-
-  const next = useCallback(() => {
-    const nextIndex = (active + 1) % TESTIMONIALS.length;
-    setDirection(1);
-    setActive(nextIndex);
-  }, [active]);
-
-  // Autoplay
-  useEffect(() => {
-    if (paused) return;
-    const id = setTimeout(next, AUTOPLAY_MS);
-    return () => clearTimeout(id);
-  }, [active, paused, next]);
-
-  const variants = {
-    enter: (dir: number) => ({
-      opacity: 0,
-      x: dir > 0 ? 48 : -48,
-      filter: "blur(4px)",
-    }),
-    center: {
-      opacity: 1,
-      x: 0,
-      filter: "blur(0px)",
-      transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as const },
+    {
+      quote: "From the first drone shot to the final edit, every frame told our story. We saw a 3× increase in social engagement within a week of launching the video.",
+      name: "Sofia Marchetti",
+      title: "Marketing Director, Vela Hospitality",
+      initials: "SM",
     },
-    exit: (dir: number) => ({
-      opacity: 0,
-      x: dir > 0 ? -48 : 48,
-      filter: "blur(4px)",
-      transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const },
-    }),
+    {
+      quote: "They handled everything — planning, shooting, editing — and delivered ahead of schedule. The result felt like a Super Bowl commercial on an indie budget.",
+      name: "Derek Calloway",
+      title: "Founder, Ironside Fitness",
+      initials: "DC",
+    },
+  ],
+};
+
+const ease = [0.16, 1, 0.3, 1] as const;
+const OFFSETS = [0, 32, 16]; // desktop stagger offsets
+
+/* ─────────────────────────────────────────────────────────────────────
+   COMPONENT
+───────────────────────────────────────────────────────────────────── */
+export default function Testimonials({ data }: { data?: TestimonialsData | null }) {
+  const d: TestimonialsData = data ?? DEFAULTS;
+
+  const headerRef  = useRef<HTMLDivElement>(null);
+  const gridRef    = useRef<HTMLDivElement>(null);
+  const scrollRef  = useRef<HTMLDivElement>(null);
+
+  const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
+  const gridInView   = useInView(gridRef,   { once: true, margin: "-60px" });
+
+  // Track which card is snapped into view on mobile for the dot indicator
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // Each card is 85vw wide + 1rem gap — find the closest snapped card
+    const cardWidth = el.scrollWidth / d.testimonials.length;
+    const index = Math.round(el.scrollLeft / cardWidth);
+    setActiveIndex(Math.min(index, d.testimonials.length - 1));
   };
-
-  const t = TESTIMONIALS[active];
 
   return (
     <section className="relative py-36 bg-[#0E0E0E] overflow-hidden">
+
       {/* Ambient glow */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-[#C2B280]/5 rounded-full blur-[130px]" />
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-175 h-125 rounded-full blur-[150px] opacity-[0.06]"
+          style={{ background: d.accentColor }}
+        />
       </div>
 
       {/* Grain */}
@@ -93,147 +105,209 @@ export default function Testimonials() {
         }}
       />
 
-      <div className="container mx-auto px-6 md:px-12 relative z-10">
-        <div className="max-w-3xl mx-auto">
+      <div className="relative z-10">
 
-          {/* Eyebrow */}
-          <div className="flex items-center justify-center gap-4 mb-16">
-            <div className="h-px w-10 bg-[#C2B280]/50" />
-            <span className="text-[#C2B280] text-[18px] font-bold tracking-[0.5em] uppercase">
-              Client Stories
-            </span>
-            <div className="h-px w-10 bg-[#C2B280]/50" />
-          </div>
-
-          {/* Card */}
-          <div
-            className="relative"
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
+        {/* ── Header — respects container padding ── */}
+        <div className="container mx-auto px-6 md:px-12">
+          <motion.div
+            ref={headerRef}
+            initial={{ opacity: 0, y: 24 }}
+            animate={headerInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, ease }}
+            className="mb-16"
           >
-            {/* Decorative border */}
-            <div className="absolute -inset-px rounded-sm bg-linear-to-b from-[#C2B280]/20 via-transparent to-transparent pointer-events-none" />
-
-            <div className="relative border border-white/6 bg-white/2 backdrop-blur-sm px-8 md:px-16 py-14 md:py-20 overflow-hidden">
-
-              {/* Large background quote mark */}
+            <div className="flex items-center gap-4 mb-6">
+              <motion.div
+                initial={{ scaleX: 0 }}
+                animate={headerInView ? { scaleX: 1 } : {}}
+                transition={{ duration: 0.9, ease }}
+                style={{ transformOrigin: "left", background: `${d.accentColor}80` }}
+                className="h-px w-12"
+              />
               <span
-                className="pointer-events-none absolute -top-4 -left-2 text-[160px] md:text-[220px] font-black leading-none text-[#C2B280]/4 select-none"
-                aria-hidden
+                className="text-[10px] font-bold tracking-[0.5em] uppercase"
+                style={{ color: d.accentColor }}
               >
-                "
+                {d.eyebrow}
               </span>
-
-              {/* Animated testimonial content */}
-              <AnimatePresence mode="wait" custom={direction}>
-                <motion.div
-                  key={active}
-                  custom={direction}
-                  variants={variants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  className="text-center"
-                >
-                  {/* Quote */}
-                  <p className="text-xl md:text-3xl font-medium tracking-tight leading-[1.45] text-white/90 italic mb-12">
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-
-                  {/* Attribution */}
-                  <div className="flex flex-col items-center gap-3">
-                    {/* Avatar */}
-                    <div className="w-10 h-10 rounded-full border border-[#C2B280]/30 bg-[#C2B280]/10 flex items-center justify-center mb-1">
-                      <span className="text-[11px] font-black tracking-wider text-[#C2B280]">
-                        {t.initials}
-                      </span>
-                    </div>
-                    <span className="text-sm font-black uppercase tracking-[0.25em] text-white">
-                      {t.name}
-                    </span>
-                    <span className="text-[11px] text-zinc-500 uppercase tracking-[0.3em]">
-                      {t.title}
-                    </span>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* ── Progress indicators ── */}
-          <div className="mt-10 flex items-center justify-center gap-5">
-            {/* Prev arrow */}
-            <button
-              onClick={() => go((active - 1 + TESTIMONIALS.length) % TESTIMONIALS.length)}
-              aria-label="Previous testimonial"
-              className="group w-8 h-8 flex items-center justify-center text-zinc-600 hover:text-[#C2B280] transition-colors duration-200"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M10 3L5 8L10 13"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-
-            {/* Track bars */}
-            <div className="flex items-center gap-2">
-              {TESTIMONIALS.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => go(i)}
-                  aria-label={`Go to testimonial ${i + 1}`}
-                  className="relative h-0.5 rounded-full overflow-hidden transition-all duration-300"
-                  style={{ width: i === active ? 40 : 16 }}
-                >
-                  {/* Track background */}
-                  <span className="absolute inset-0 bg-white/10 rounded-full" />
-                  {/* Animated fill */}
-                  {i === active && (
-                    <motion.span
-                      className="absolute inset-y-0 left-0 bg-[#C2B280] rounded-full"
-                      initial={{ width: "0%" }}
-                      animate={{ width: paused ? undefined : "100%" }}
-                      transition={
-                        paused
-                          ? { duration: 0 }
-                          : { duration: AUTOPLAY_MS / 1000, ease: "linear" }
-                      }
-                      key={`${active}-${paused}`}
-                    />
-                  )}
-                </button>
-              ))}
             </div>
 
-            {/* Next arrow */}
-            <button
-              onClick={() => go((active + 1) % TESTIMONIALS.length)}
-              aria-label="Next testimonial"
-              className="group w-8 h-8 flex items-center justify-center text-zinc-600 hover:text-[#C2B280] transition-colors duration-200"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M6 3L11 8L6 13"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
-
-          {/* Review count */}
-          <p className="text-center mt-5 text-[10px] tracking-[0.4em] uppercase text-zinc-700">
-            {active + 1} / {TESTIMONIALS.length}
-          </p>
-
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+              <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none">
+                What Our <br />
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-white to-zinc-600">
+                  Clients Say.
+                </span>
+              </h2>
+              <p className="text-zinc-600 text-xs tracking-[0.3em] uppercase max-w-xs md:text-right">
+                Real results from real brands
+              </p>
+            </div>
+          </motion.div>
         </div>
+
+        {/* ════════════════════════════════════
+            DESKTOP — 3-column staggered grid
+            (hidden on mobile)
+        ════════════════════════════════════ */}
+        <div className="container mx-auto px-6 md:px-12">
+          <div
+            ref={gridRef}
+            className="hidden md:grid md:grid-cols-3 gap-6 md:items-start"
+          >
+            {d.testimonials.map((t, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 40 + (OFFSETS[i % OFFSETS.length] ?? 0) * 0.5 }}
+                animate={gridInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.75, delay: i * 0.12, ease }}
+                style={{ marginTop: OFFSETS[i % OFFSETS.length] ?? 0 }}
+              >
+                <TestimonialCard
+                  testimonial={t}
+                  accentColor={d.accentColor}
+                />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* ════════════════════════════════════
+            MOBILE — horizontal snap scroll
+            (hidden on desktop)
+            Bleeds to the right edge of the screen
+            so the user can see the next card peeking.
+        ════════════════════════════════════ */}
+        <div className="md:hidden">
+          {/* Scroll track — starts at the same left padding as the container
+              but bleeds to the right with no right padding so the next card peeks */}
+          <div
+            ref={scrollRef}
+            onScroll={handleScroll}
+            className="flex gap-4 overflow-x-auto pl-6 pr-6 snap-x snap-mandatory"
+            style={{
+              // Hide scrollbar across browsers
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+              WebkitOverflowScrolling: "touch",
+            }}
+          >
+            {d.testimonials.map((t, i) => (
+              <div
+                key={i}
+                // 85vw makes the current card fill most of the screen
+                // while the next one peeks from the right
+                className="snap-start shrink-0 w-[85vw]"
+              >
+                <TestimonialCard
+                  testimonial={t}
+                  accentColor={d.accentColor}
+                />
+              </div>
+            ))}
+
+            {/* Right padding spacer so the last card can fully snap */}
+            <div className="shrink-0 w-6" aria-hidden />
+          </div>
+
+          {/* Dot indicators */}
+          <div className="flex items-center justify-center gap-2 mt-6 px-6">
+            {d.testimonials.map((_, i) => (
+              <button
+                key={i}
+                aria-label={`Go to testimonial ${i + 1}`}
+                onClick={() => {
+                  const el = scrollRef.current;
+                  if (!el) return;
+                  const cardWidth = el.scrollWidth / d.testimonials.length;
+                  el.scrollTo({ left: cardWidth * i, behavior: "smooth" });
+                  setActiveIndex(i);
+                }}
+                className="transition-all duration-300 rounded-full"
+                style={{
+                  width: i === activeIndex ? 24 : 6,
+                  height: 6,
+                  background: i === activeIndex
+                    ? d.accentColor
+                    : "rgba(255,255,255,0.15)",
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Scroll hint — fades after first interaction */}
+          <p className="text-center mt-4 text-[10px] tracking-[0.35em] uppercase text-zinc-700">
+            Swipe to explore
+          </p>
+        </div>
+
       </div>
     </section>
+  );
+}
+
+/* ─── Shared card — used by both desktop grid and mobile scroll ──────── */
+function TestimonialCard({
+  testimonial: t,
+  accentColor,
+}: {
+  testimonial: Testimonial;
+  accentColor: string;
+}) {
+  return (
+    <div className="group relative flex flex-col h-full border border-white/6 bg-white/2 backdrop-blur-sm hover:border-white/12 transition-colors duration-500">
+      {/* Top accent line on hover */}
+      <div
+        className="absolute top-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{
+          background: `linear-gradient(to right, transparent, ${accentColor}60, transparent)`,
+        }}
+      />
+
+      <div className="p-8 flex flex-col flex-1">
+        {/* Decorative quote mark */}
+        <span
+          className="block text-6xl font-black leading-none select-none"
+          style={{ color: `${accentColor}20` }}
+          aria-hidden
+        >
+          "
+        </span>
+
+        {/* Quote */}
+        <p className="text-zinc-300 text-sm md:text-base leading-[1.75] italic flex-1 mb-10">
+          &ldquo;{t.quote}&rdquo;
+        </p>
+
+        {/* Divider */}
+        <div className="h-px bg-white/6 mb-6" />
+
+        {/* Attribution */}
+        <div className="flex items-center gap-3">
+          <div
+            className="w-9 h-9 rounded-full border flex items-center justify-center shrink-0"
+            style={{
+              borderColor: `${accentColor}40`,
+              background: `${accentColor}12`,
+            }}
+          >
+            <span
+              className="text-[10px] font-black tracking-wider"
+              style={{ color: accentColor }}
+            >
+              {t.initials}
+            </span>
+          </div>
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-white leading-none mb-0.5">
+              {t.name}
+            </p>
+            <p className="text-[10px] text-zinc-600 uppercase tracking-[0.2em]">
+              {t.title}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
