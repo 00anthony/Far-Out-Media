@@ -113,6 +113,7 @@ export const servicePackage = defineType({
     defineField({
       name: "deliverables",
       title: "What You Get",
+      description: "first 4 points will be listed on home page",
       type: "array",
       of: [
         {

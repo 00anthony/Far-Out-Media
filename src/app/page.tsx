@@ -48,10 +48,22 @@ const ABOUT_QUERY = `*[_type == "about"][0] {
   imageAlt
 }`;
 
+const SERVICES_HOME_QUERY = `*[_type == "servicePackage"] | order(order asc) {
+  _id,
+  title,
+  category,
+  "description": tagline,
+  "bullets": deliverables[0..3][].label,
+  featured,
+  order
+}`;
+
 export default async function Home() {
   const heroData: HeroData | null = await client.fetch(HERO_QUERY);
   const featuredWorkData = await client.fetch(FEATURED_WORK_QUERY);
   const aboutData = await client.fetch(ABOUT_QUERY);
+  const packagesData = await client.fetch(SERVICES_HOME_QUERY);
+
 
   return (
     <div className="min-h-screen bg-[#0E0E0E] text-white selection:bg-[#C2B280] selection:text-black">
@@ -59,7 +71,20 @@ export default async function Home() {
         <Hero data={heroData ?? undefined} />
         <FeaturedWork data={featuredWorkData ?? undefined} />
         <About data={aboutData ?? undefined} />
-        <Services />
+        <Services
+          data={{
+            eyebrow: "Our Packages",
+            headingFirst: "Services &",
+            headingAccent: "Packages",
+            subheading: "Every package is built around your goals...",
+            accentColor: "#C2B280",
+            ctaText: "Need something custom?...",
+            ctaHref: "/services",
+            ctaPrimaryLabel: "Get a Free Quote",
+            ctaPrimaryHref: "/#contact",
+            packages: packagesData ?? [],
+          }}
+        />
         <WhyVideo />
         <Process />
         <Testimonials />
