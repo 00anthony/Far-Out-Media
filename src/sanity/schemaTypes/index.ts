@@ -8,6 +8,7 @@ import { about } from './About'
 import { benefits } from './Benefits'
 import { process } from './Process'
 import { testimonials } from './Testimonials'
+import { contactSection } from './Contactsection'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -20,5 +21,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     benefits,
     process, 
     testimonials, 
+    contactSection, 
   ], 
 }

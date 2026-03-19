@@ -3,90 +3,126 @@
 import { useState, useRef } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 
-type FormState = "idle" | "loading" | "success" | "error";
+/* ─────────────────────────────────────────────────────────────────────
+   TYPES — mirror the Sanity `contactSection` schema
+───────────────────────────────────────────────────────────────────── */
+export type FieldType = "text" | "email" | "tel" | "textarea";
 
-interface FormData {
-  name: string;
-  email: string;
-  company: string;
-  projectType: string;
-  message: string;
+export interface FormField {
+  name: string;           // internal key sent to the API, e.g. "phone"
+  label: string;          // floating label, e.g. "Phone Number"
+  type: FieldType;
+  required: boolean;
+  colSpan: "half" | "full";
 }
 
-const PROJECT_TYPES = [
-  "Brand Video",
-  "Drone Footage",
-  "Event Coverage",
-  "Real Estate",
-  "Social Media Content",
-  "Other",
-];
+export interface ContactSectionData {
+  eyebrow: string;
+  headingFirst: string;
+  headingAccent: string;
+  accentColor: string;
+  subheading: string;
+  projectTypes: string[];  // pill buttons — add/remove/reorder in Studio
+  formFields: FormField[]; // dynamic fields — add phone, budget, etc. in Studio
+  submitLabel: string;
+  successHeading: string;
+  successBody: string;
+  successFooter: string;
+  footerLeft: string;
+  footerRight: string;
+}
 
-export default function ContactSection() {
-  const [formState, setFormState] = useState<FormState>("idle");
-  const [formData, setFormData] = useState<FormData>({
-    name: "",
-    email: "",
-    company: "",
-    projectType: "",
-    message: "",
-  });
+/* ─────────────────────────────────────────────────────────────────────
+   DEFAULTS
+   Used when Sanity returns null / no data prop passed.
+───────────────────────────────────────────────────────────────────── */
+const DEFAULTS: ContactSectionData = {
+  eyebrow: "Ready to Begin?",
+  headingFirst: "Let's Create",
+  headingAccent: "Something Far Out.",
+  accentColor: "#C2B280",
+  subheading: "Tell us about your project. We'll get back within 24 hours with a custom plan—no obligation.",
+  projectTypes: [
+    "Brand Video",
+    "Drone Footage",
+    "Event Coverage",
+    "Real Estate",
+    "Social Media Content",
+    "Other",
+  ],
+  formFields: [
+    { name: "name",    label: "Your Name",                  type: "text",     required: true,  colSpan: "half" },
+    { name: "email",   label: "Email Address",              type: "email",    required: true,  colSpan: "half" },
+    { name: "company", label: "Company / Brand",            type: "text",     required: false, colSpan: "half" },
+    { name: "message", label: "Tell us about your project", type: "textarea", required: true,  colSpan: "full" },
+  ],
+  submitLabel: "Get a Free Quote",
+  successHeading: "Message Received.",
+  successBody: "We'll review your project and reach out within 24 hours. Get ready for something far out.",
+  successFooter: "Far Out Media · Charlotte, NC",
+  footerLeft: "Serving Charlotte, NC & Worldwide",
+  footerRight: "Currently Accepting Projects",
+};
+
+/* ─────────────────────────────────────────────────────────────────────
+   COMPONENT
+───────────────────────────────────────────────────────────────────── */
+type FormState = "idle" | "loading" | "success" | "error";
+
+export default function ContactSection({ data }: { data?: ContactSectionData | null }) {
+  const d: ContactSectionData = data ?? DEFAULTS;
+
+  // Build initial form values dynamically from field definitions
+  const buildInitialValues = () => {
+    const values: Record<string, string> = { projectType: "" };
+    d.formFields.forEach((f) => { values[f.name] = ""; });
+    return values;
+  };
+
+  const [formState, setFormState]       = useState<FormState>("idle");
+  const [formData, setFormData]         = useState<Record<string, string>>(buildInitialValues);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
 
   const sectionRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+  const isInView   = useInView(sectionRef, { once: true, margin: "-100px" });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleProjectType = (type: string) => {
-    setFormData((prev) => ({ ...prev, projectType: type }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormState("loading");
     setErrorMessage("");
-
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Something went wrong.");
+        const json = await res.json();
+        throw new Error(json.error || "Something went wrong.");
       }
-
       setFormState("success");
     } catch (err: unknown) {
       setFormState("error");
-      setErrorMessage(
-        err instanceof Error ? err.message : "Something went wrong."
-      );
+      setErrorMessage(err instanceof Error ? err.message : "Something went wrong.");
     }
   };
 
-  /* ─── Animation variants ─── */
   const containerVariants = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.08 } },
   };
-
   const fadeUp = {
     hidden: { opacity: 0, y: 32 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const } },
   };
-
   const lineVariants = {
     hidden: { scaleX: 0 },
-    visible: { scaleX: 1, transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1] as const} },
+    visible: { scaleX: 1, transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1] as const } },
   };
 
   return (
@@ -95,14 +131,14 @@ export default function ContactSection() {
       ref={sectionRef}
       className="relative py-40 bg-zinc-950 overflow-hidden"
     >
-      {/* ── Ambient glow blobs ── */}
+      {/* Ambient glows */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-175 h-275 bg-[#C2B280]/8 rounded-full blur-[140px]" />
         <div className="absolute bottom-0 right-0 w-100 h-100 bg-[#94aec2]/6 rounded-full blur-[120px]" />
         <div className="absolute top-0 left-0 w-75 h-75 bg-[#657886]/5 rounded-full blur-[100px]" />
       </div>
 
-      {/* ── Grain texture overlay ── */}
+      {/* Grain */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.025]"
         style={{
@@ -118,96 +154,42 @@ export default function ContactSection() {
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
         >
-          {/* ── Eyebrow ── */}
+          {/* Eyebrow */}
           <motion.div variants={fadeUp} className="flex items-center gap-4 mb-8">
             <motion.div
               variants={lineVariants}
-              style={{ transformOrigin: "left" }}
-              className="h-px w-12 bg-[#C2B280]"
+              style={{ transformOrigin: "left", background: d.accentColor }}
+              className="h-px w-12"
             />
-            <span className="text-[#C2B280] text-xs font-bold tracking-[0.5em] uppercase">
-              Ready to Begin?
+            <span className="text-xs font-bold tracking-[0.5em] uppercase" style={{ color: d.accentColor }}>
+              {d.eyebrow}
             </span>
           </motion.div>
 
-          {/* ── Headline ── */}
-          <motion.h2
-            variants={fadeUp}
-            className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-none"
-          >
-            Let's Create <br />
+          {/* Heading */}
+          <motion.h2 variants={fadeUp} className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-none">
+            {d.headingFirst} <br />
             <span className="text-transparent bg-clip-text bg-linear-to-b from-white to-zinc-600">
-              Something Far Out.
+              {d.headingAccent}
             </span>
           </motion.h2>
 
-          {/* ── Sub-headline ── */}
-          <motion.p
-            variants={fadeUp}
-            className="text-zinc-400 text-base md:text-lg max-w-xl mb-16 leading-relaxed"
-          >
-            Tell us about your project. We'll get back within 24 hours with a
-            custom plan—no obligation.
+          {/* Subheading */}
+          <motion.p variants={fadeUp} className="text-zinc-400 text-base md:text-lg max-w-xl mb-16 leading-relaxed">
+            {d.subheading}
           </motion.p>
 
-          {/* ── Divider ── */}
+          {/* Divider */}
           <motion.div
             variants={lineVariants}
             style={{ transformOrigin: "left" }}
             className="h-px w-full bg-linear-to-r from-[#C2B280]/40 via-zinc-700/40 to-transparent mb-16"
           />
 
-          {/* ── Form / Success ── */}
+          {/* Form / Success */}
           <AnimatePresence mode="wait">
             {formState === "success" ? (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, scale: 0.96, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="flex flex-col items-center justify-center py-24 text-center gap-6"
-              >
-                {/* Animated checkmark */}
-                <svg
-                  className="w-16 h-16"
-                  viewBox="0 0 64 64"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <motion.circle
-                    cx="32"
-                    cy="32"
-                    r="30"
-                    stroke="#C2B280"
-                    strokeWidth="1.5"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                  />
-                  <motion.path
-                    d="M20 33 L28 41 L44 24"
-                    stroke="#C2B280"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 0.5, delay: 0.6, ease: "easeOut" }}
-                  />
-                </svg>
-                <h3 className="text-3xl font-black tracking-tight text-white">
-                  Message Received.
-                </h3>
-                <p className="text-zinc-400 max-w-sm">
-                  We'll review your project and reach out within 24 hours. Get
-                  ready for something far out.
-                </p>
-                <p className="text-xs tracking-[0.4em] uppercase text-[#C2B280] mt-2">
-                  Far Out Media · Charlotte, NC
-                </p>
-              </motion.div>
+              <SuccessState key="success" d={d} />
             ) : (
               <motion.form
                 key="form"
@@ -218,95 +200,75 @@ export default function ContactSection() {
                 exit={{ opacity: 0 }}
                 className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10"
               >
-                {/* Name */}
-                <motion.div variants={fadeUp} className="relative">
-                  <FieldLabel label="Your Name" focused={focusedField === "name"} filled={!!formData.name} />
-                  <input
-                    type="text"
-                    name="name"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                    onFocus={() => setFocusedField("name")}
-                    onBlur={() => setFocusedField(null)}
-                    className="w-full bg-transparent border-b border-zinc-700 py-3 pt-5 text-white text-sm focus:outline-none transition-colors duration-200 focus:border-[#C2B280] placeholder-transparent"
-                    placeholder="Your Name"
-                  />
-                  <FieldUnderline active={focusedField === "name"} />
-                </motion.div>
+                {/* Dynamic fields from Sanity */}
+                {d.formFields.map((field) => (
+                  <motion.div
+                    key={field.name}
+                    variants={fadeUp}
+                    className={`relative ${field.colSpan === "full" ? "md:col-span-2" : ""}`}
+                  >
+                    <FieldLabel
+                      label={field.label}
+                      focused={focusedField === field.name}
+                      filled={!!formData[field.name]}
+                      accentColor={d.accentColor}
+                    />
 
-                {/* Email */}
-                <motion.div variants={fadeUp} className="relative">
-                  <FieldLabel label="Email Address" focused={focusedField === "email"} filled={!!formData.email} />
-                  <input
-                    type="email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    onFocus={() => setFocusedField("email")}
-                    onBlur={() => setFocusedField(null)}
-                    className="w-full bg-transparent border-b border-zinc-700 py-3 pt-5 text-white text-sm focus:outline-none transition-colors duration-200 focus:border-[#C2B280] placeholder-transparent"
-                    placeholder="Email Address"
-                  />
-                  <FieldUnderline active={focusedField === "email"} />
-                </motion.div>
+                    {field.type === "textarea" ? (
+                      <textarea
+                        name={field.name}
+                        required={field.required}
+                        rows={4}
+                        value={formData[field.name] ?? ""}
+                        onChange={handleChange}
+                        onFocus={() => setFocusedField(field.name)}
+                        onBlur={() => setFocusedField(null)}
+                        placeholder={field.label}
+                        className="w-full bg-transparent border-b border-zinc-700 py-3 pt-5 text-white text-sm focus:outline-none resize-none transition-colors duration-200 placeholder-transparent"
+                      />
+                    ) : (
+                      <input
+                        type={field.type}
+                        name={field.name}
+                        required={field.required}
+                        value={formData[field.name] ?? ""}
+                        onChange={handleChange}
+                        onFocus={() => setFocusedField(field.name)}
+                        onBlur={() => setFocusedField(null)}
+                        placeholder={field.label}
+                        className="w-full bg-transparent border-b border-zinc-700 py-3 pt-5 text-white text-sm focus:outline-none transition-colors duration-200 placeholder-transparent"
+                      />
+                    )}
 
-                {/* Company */}
-                <motion.div variants={fadeUp} className="relative">
-                  <FieldLabel label="Company / Brand" focused={focusedField === "company"} filled={!!formData.company} />
-                  <input
-                    type="text"
-                    name="company"
-                    value={formData.company}
-                    onChange={handleChange}
-                    onFocus={() => setFocusedField("company")}
-                    onBlur={() => setFocusedField(null)}
-                    className="w-full bg-transparent border-b border-zinc-700 py-3 pt-5 text-white text-sm focus:outline-none transition-colors duration-200 focus:border-[#C2B280] placeholder-transparent"
-                    placeholder="Company / Brand"
-                  />
-                  <FieldUnderline active={focusedField === "company"} />
-                </motion.div>
+                    <FieldUnderline active={focusedField === field.name} accentColor={d.accentColor} />
+                  </motion.div>
+                ))}
 
-                {/* Project Type */}
-                <motion.div variants={fadeUp} className="flex flex-col gap-3">
-                  <span className="text-[10px] tracking-[0.35em] uppercase text-zinc-500 font-semibold">
-                    Project Type
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {PROJECT_TYPES.map((type) => (
-                      <button
-                        key={type}
-                        type="button"
-                        onClick={() => handleProjectType(type)}
-                        className={`px-3 py-1.5 text-[11px] tracking-widest uppercase font-semibold border transition-all duration-200 ${
-                          formData.projectType === type
-                            ? "border-[#C2B280] text-[#C2B280] bg-[#C2B280]/10"
-                            : "border-zinc-700 text-zinc-500 hover:border-zinc-500 hover:text-zinc-300"
-                        }`}
-                      >
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-
-                {/* Message – full width */}
-                <motion.div variants={fadeUp} className="relative md:col-span-2">
-                  <FieldLabel label="Tell us about your project" focused={focusedField === "message"} filled={!!formData.message} />
-                  <textarea
-                    name="message"
-                    required
-                    rows={4}
-                    value={formData.message}
-                    onChange={handleChange}
-                    onFocus={() => setFocusedField("message")}
-                    onBlur={() => setFocusedField(null)}
-                    className="w-full bg-transparent border-b border-zinc-700 py-3 pt-5 text-white text-sm focus:outline-none resize-none transition-colors duration-200 focus:border-[#C2B280] placeholder-transparent"
-                    placeholder="Tell us about your project"
-                  />
-                  <FieldUnderline active={focusedField === "message"} />
-                </motion.div>
+                {/* Project type pills */}
+                {d.projectTypes.length > 0 && (
+                  <motion.div variants={fadeUp} className="flex flex-col gap-3 md:col-span-2">
+                    <span className="text-[10px] tracking-[0.35em] uppercase text-zinc-500 font-semibold">
+                      Project Type
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {d.projectTypes.map((type) => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => setFormData((prev) => ({ ...prev, projectType: type }))}
+                          className="cursor-pointer px-3 py-1.5 text-[11px] tracking-widest uppercase font-semibold border transition-all duration-200"
+                          style={
+                            formData.projectType === type
+                              ? { borderColor: d.accentColor, color: d.accentColor, background: `${d.accentColor}1a` }
+                              : { borderColor: "#3f3f46", color: "#71717a" }
+                          }
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
 
                 {/* Error */}
                 <AnimatePresence>
@@ -322,12 +284,12 @@ export default function ContactSection() {
                   )}
                 </AnimatePresence>
 
-                {/* Submit row */}
+                {/* Submit */}
                 <motion.div
                   variants={fadeUp}
                   className="md:col-span-2 flex flex-col md:flex-row items-start md:items-center gap-6 pt-4"
                 >
-                  <SubmitButton loading={formState === "loading"} />
+                  <SubmitButton label={d.submitLabel} loading={formState === "loading"} accentColor={d.accentColor} />
                   <p className="text-zinc-600 text-xs tracking-[0.3em] uppercase">
                     No commitment · 24-hour response
                   </p>
@@ -336,19 +298,15 @@ export default function ContactSection() {
             )}
           </AnimatePresence>
 
-          {/* ── Bottom divider + footer note ── */}
+          {/* Footer */}
           <motion.div
             variants={fadeUp}
             className="mt-20 pt-10 border-t border-zinc-800/60 flex flex-col md:flex-row items-center justify-between gap-4"
           >
-            <p className="text-zinc-600 text-xs tracking-[0.4em] uppercase">
-              Serving Charlotte, NC &amp; Worldwide
-            </p>
+            <p className="text-zinc-600 text-xs tracking-[0.4em] uppercase">{d.footerLeft}</p>
             <div className="flex items-center gap-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#C2B280] animate-pulse" />
-              <p className="text-zinc-600 text-xs tracking-widest uppercase">
-                Currently Accepting Projects
-              </p>
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: d.accentColor }} />
+              <p className="text-zinc-600 text-xs tracking-widest uppercase">{d.footerRight}</p>
             </div>
           </motion.div>
         </motion.div>
@@ -357,24 +315,44 @@ export default function ContactSection() {
   );
 }
 
-/* ─── Sub-components ─── */
+/* ─── Sub-components ─────────────────────────────────────────────────── */
 
-function FieldLabel({
-  label,
-  focused,
-  filled,
-}: {
-  label: string;
-  focused: boolean;
-  filled: boolean;
+function SuccessState({ d }: { d: ContactSectionData }) {
+  return (
+    <motion.div
+      key="success"
+      initial={{ opacity: 0, scale: 0.96, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
+      className="flex flex-col items-center justify-center py-24 text-center gap-6"
+    >
+      <svg className="w-16 h-16" viewBox="0 0 64 64" fill="none">
+        <motion.circle cx="32" cy="32" r="30" stroke={d.accentColor} strokeWidth="1.5"
+          initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        />
+        <motion.path d="M20 33 L28 41 L44 24" stroke={d.accentColor} strokeWidth="2"
+          strokeLinecap="round" strokeLinejoin="round" fill="none"
+          initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+          transition={{ duration: 0.5, delay: 0.6, ease: "easeOut" }}
+        />
+      </svg>
+      <h3 className="text-3xl font-black tracking-tight text-white">{d.successHeading}</h3>
+      <p className="text-zinc-400 max-w-sm">{d.successBody}</p>
+      <p className="text-xs tracking-[0.4em] uppercase mt-2" style={{ color: d.accentColor }}>
+        {d.successFooter}
+      </p>
+    </motion.div>
+  );
+}
+
+function FieldLabel({ label, focused, filled, accentColor }: {
+  label: string; focused: boolean; filled: boolean; accentColor: string;
 }) {
   return (
     <motion.label
-      animate={{
-        y: focused || filled ? 0 : 20,
-        scale: focused || filled ? 1 : 1,
-        color: focused ? "#C2B280" : "#71717a",
-      }}
+      animate={{ y: focused || filled ? 0 : 20, color: focused ? accentColor : "#71717a" }}
       transition={{ duration: 0.2 }}
       className="absolute top-0 left-0 text-[10px] tracking-[0.35em] uppercase font-semibold pointer-events-none"
       style={{ color: "#71717a" }}
@@ -384,19 +362,21 @@ function FieldLabel({
   );
 }
 
-function FieldUnderline({ active }: { active: boolean }) {
+function FieldUnderline({ active, accentColor }: { active: boolean; accentColor: string }) {
   return (
     <motion.div
-      className="absolute bottom-0 left-0 h-px bg-[#C2B280]"
+      className="absolute bottom-0 left-0 h-px"
+      style={{ background: accentColor, transformOrigin: "left", width: "100%" }}
       animate={{ scaleX: active ? 1 : 0 }}
       initial={{ scaleX: 0 }}
-      style={{ transformOrigin: "left", width: "100%" }}
-      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as const }}
     />
   );
 }
 
-function SubmitButton({ loading }: { loading: boolean }) {
+function SubmitButton({ label, loading, accentColor }: {
+  label: string; loading: boolean; accentColor: string;
+}) {
   return (
     <motion.button
       type="submit"
@@ -405,44 +385,23 @@ function SubmitButton({ loading }: { loading: boolean }) {
       whileTap={{ scale: 0.97 }}
       className="group relative px-14 py-5 bg-white text-black font-black uppercase tracking-[0.2em] text-xs overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed"
     >
-      {/* Gold fill on hover */}
-      <span className="absolute inset-0 bg-[#C2B280] -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]" />
-
+      <span
+        className="absolute inset-0 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        style={{ background: accentColor }}
+      />
       <span className="relative z-10 flex items-center gap-3">
         {loading ? (
           <>
-            <svg
-              className="animate-spin w-4 h-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="3"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
-              />
+            <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
             </svg>
             Sending...
           </>
         ) : (
           <>
-            Get a Free Quote
-            <svg
-              className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2.5}
-            >
+            {label}
+            <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </>

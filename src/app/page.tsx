@@ -79,6 +79,15 @@ const TESTIMONIALS_QUERY = `*[_type == "testimonials"][0] {
   testimonials[] { quote, name, title, initials }
 }`;
 
+const CONTACT_QUERY = `*[_type == "contactSection"][0] {
+  eyebrow, headingFirst, headingAccent, accentColor, subheading,
+  projectTypes,
+  formFields[] { name, label, type, required, colSpan },
+  submitLabel,
+  successHeading, successBody, successFooter,
+  footerLeft, footerRight
+}`;
+
 export default async function Home() {
   const heroData: HeroData | null = await client.fetch(HERO_QUERY);
   const featuredWorkData = await client.fetch(FEATURED_WORK_QUERY);
@@ -87,6 +96,7 @@ export default async function Home() {
   const benefitsData = await client.fetch(BENEFITS_QUERY);
   const processData = await client.fetch(PROCESS_QUERY);
   const testimonialsData = await client.fetch(TESTIMONIALS_QUERY);
+  const contactData = await client.fetch(CONTACT_QUERY);
 
   return (
     <div className="min-h-screen bg-[#0E0E0E] text-white selection:bg-[#C2B280] selection:text-black">
@@ -111,7 +121,7 @@ export default async function Home() {
         <Benefits data={benefitsData ?? undefined} />
         <Process data={processData ?? undefined} />
         <Testimonials data={testimonialsData ?? undefined} />
-        <ContactSection />
+        <ContactSection data={contactData ?? undefined} />
       </main>
       <Footer />
     </div>

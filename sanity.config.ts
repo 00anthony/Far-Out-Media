@@ -21,6 +21,7 @@ import { about } from './src/sanity/schemaTypes/About'
 import { benefits } from './src/sanity/schemaTypes/Benefits'
 import { process } from './src/sanity/schemaTypes/Process'
 import { testimonials } from './src/sanity/schemaTypes/Testimonials'
+import { contactSection } from './src/sanity/schemaTypes/Contactsection'
 
 export default defineConfig({
   basePath: '/studio',
@@ -37,6 +38,7 @@ export default defineConfig({
     benefits,
     process, 
     testimonials, 
+    contactSection, 
   ]},
   plugins: [
     structureTool({structure}),
