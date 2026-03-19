@@ -2,7 +2,16 @@ import { type SchemaTypeDefinition } from 'sanity'
 import { servicePackage } from './servicePackage'
 import { navbar } from './Navbar'
 import { hero } from './Hero'
+import { featuredWork } from './FeaturedWork'
+import { workProject } from './workProject'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [servicePackage, navbar, hero], 
+  types: [
+    servicePackage, 
+    navbar, 
+    hero, 
+    featuredWork,
+    workProject,
+    
+  ], 
 }

@@ -22,13 +22,30 @@ const HERO_QUERY = `*[_type == "hero"][0] {
   videoOpacity
 }`;
 
+const FEATURED_WORK_QUERY = `*[_type == "featuredWork"][0] {
+  eyebrow, heading, subheading, accentColor,
+  ctaEyebrow, ctaLabel, ctaHref,
+  projects[]-> {
+    _id,
+    title,
+    category,
+    "thumbnail":        thumbnail.asset->url,
+    thumbnailAlt,
+    "slug":             slug.current,
+    "previewVideoMp4":  previewVideoMp4.asset->url,
+    "previewVideoWebm": previewVideoWebm.asset->url
+  }
+}`;
+
 export default async function Home() {
   const heroData: HeroData | null = await client.fetch(HERO_QUERY);
+  const featuredWorkData = await client.fetch(FEATURED_WORK_QUERY);
+
   return (
     <div className="min-h-screen bg-[#0E0E0E] text-white selection:bg-[#C2B280] selection:text-black">
       <main>
         <Hero data={heroData ?? undefined} />
-        <FeaturedWork />
+        <FeaturedWork data={featuredWorkData ?? undefined} />
         <About />
         <Services />
         <WhyVideo />

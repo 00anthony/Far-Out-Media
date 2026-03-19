@@ -15,13 +15,22 @@ import {structure} from './src/sanity/structure'
 import { servicePackage } from './src/sanity/schemaTypes/servicePackage'
 import { navbar } from './src/sanity/schemaTypes/Navbar'
 import { hero } from './src/sanity/schemaTypes/Hero'
+import { featuredWork } from './src/sanity/schemaTypes/FeaturedWork'
+import { workProject } from './src/sanity/schemaTypes/workProject'
 
 export default defineConfig({
   basePath: '/studio',
   projectId,
   dataset,
   // Add and edit the content schema in the './sanity/schemaTypes' folder
-  schema: { types: [servicePackage, navbar, hero]},
+  schema: { types: [
+    servicePackage, 
+    navbar, 
+    hero, 
+    featuredWork,
+    workProject,
+    
+  ]},
   plugins: [
     structureTool({structure}),
     // Vision is for querying with GROQ from inside the Studio
