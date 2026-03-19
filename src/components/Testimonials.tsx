@@ -86,7 +86,7 @@ export default function Testimonials({ data }: { data?: TestimonialsData | null 
   };
 
   return (
-    <section className="relative py-36 bg-[#0E0E0E] overflow-hidden">
+    <section className="relative py-18 bg-[#0E0E0E] overflow-hidden">
 
       {/* Ambient glow */}
       <div className="pointer-events-none absolute inset-0">

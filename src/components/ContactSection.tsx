@@ -129,7 +129,7 @@ export default function ContactSection({ data }: { data?: ContactSectionData | n
     <section
       id="contact"
       ref={sectionRef}
-      className="relative py-40 bg-zinc-950 overflow-hidden"
+      className="relative py-20 bg-zinc-950 overflow-hidden"
     >
       {/* Ambient glows */}
       <div className="pointer-events-none absolute inset-0">

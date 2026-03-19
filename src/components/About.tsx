@@ -62,7 +62,7 @@ export default function About({ data }: { data?: AboutData | null }) {
   const d: AboutData = data ?? DEFAULTS;
 
   return (
-    <section id="about" className="py-32 bg-[#0E0E0E] overflow-hidden">
+    <section id="about" className="py-16 bg-[#0E0E0E] overflow-hidden">
       <div className="container mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
 

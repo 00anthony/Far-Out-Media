@@ -59,7 +59,7 @@ export default function Process({ data }: { data?: ProcessData | null }) {
     <section
       id="process"
       ref={sectionRef}
-      className="relative py-36 bg-black border-y border-white/5 overflow-hidden"
+      className="relative py-18 bg-black border-y border-white/5 overflow-hidden"
     >
       {/* ── Ambient glow ── */}
       <div className="pointer-events-none absolute inset-0">

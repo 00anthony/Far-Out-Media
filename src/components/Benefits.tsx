@@ -44,7 +44,7 @@ export default function Benefits({ data }: { data?: BenefitsData | null }) {
   const col2 = d.benefits.filter((_, i) => i % 2 !== 0);
 
   return (
-    <section className="py-32 bg-[#0E0E0E]">
+    <section className="py-16 bg-[#0E0E0E]">
       <div className="container mx-auto px-6 md:px-12">
         <div className="max-w-4xl mx-auto">
 
