@@ -9,7 +9,6 @@ import Benefits from '../components/Benefits';
 import Process from '../components/Process';
 import Testimonials from '../components/Testimonials';
 import ContactSection from '../components/ContactSection';
-import Footer from '../components/Footer';
 
 const HERO_QUERY = `*[_type == "hero"][0] {
   eyebrow, headingFirst, headingAccent,
@@ -123,7 +122,6 @@ export default async function Home() {
         <Testimonials data={testimonialsData ?? undefined} />
         <ContactSection data={contactData ?? undefined} />
       </main>
-      <Footer />
     </div>
   );
 }

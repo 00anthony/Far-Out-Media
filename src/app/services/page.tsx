@@ -7,7 +7,6 @@
 import { client } from "../../sanity/lib/client";
 import ServicesClient from "./ServicesClient"; // we split the interactive UI out
 import { Package } from "./types";
-import Footer from "@/src/components/Footer";
 
 /* ─────────────────────────────────────────────────────────────────────
    GROQ QUERY
@@ -80,7 +79,6 @@ export default async function ServicesPage() {
   return (
     <>
       <ServicesClient packages={packages} />
-      <Footer />
     </>
     
   );

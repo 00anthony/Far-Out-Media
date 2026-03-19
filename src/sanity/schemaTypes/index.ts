@@ -9,6 +9,7 @@ import { benefits } from './Benefits'
 import { process } from './Process'
 import { testimonials } from './Testimonials'
 import { contactSection } from './Contactsection'
+import { footer } from './Footer'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -22,5 +23,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     process, 
     testimonials, 
     contactSection, 
+    footer, 
   ], 
 }
