@@ -5,7 +5,7 @@ import type { HeroData } from '../components/Hero';
 import FeaturedWork from '../components/FeaturedWork';
 import About from '../components/About';
 import Services from '../components/Services';
-import WhyVideo from '../components/WhyVideo';
+import Benefits from '../components/Benefits';
 import Process from '../components/Process';
 import Testimonials from '../components/Testimonials';
 import ContactSection from '../components/ContactSection';
@@ -58,11 +58,22 @@ const SERVICES_HOME_QUERY = `*[_type == "servicePackage"] | order(order asc) {
   order
 }`;
 
+const BENEFITS_QUERY = `*[_type == "benefits"][0] {
+  eyebrow,
+  headingFirst,
+  headingAccent,
+  accentColor,
+  benefits[] { value, body },
+  calloutHeading,
+  calloutQuote
+}`;
+
 export default async function Home() {
   const heroData: HeroData | null = await client.fetch(HERO_QUERY);
   const featuredWorkData = await client.fetch(FEATURED_WORK_QUERY);
   const aboutData = await client.fetch(ABOUT_QUERY);
   const packagesData = await client.fetch(SERVICES_HOME_QUERY);
+  const benefitsData = await client.fetch(BENEFITS_QUERY);
 
 
   return (
@@ -85,7 +96,7 @@ export default async function Home() {
             packages: packagesData ?? [],
           }}
         />
-        <WhyVideo />
+        <Benefits data={benefitsData ?? undefined} />
         <Process />
         <Testimonials />
         <ContactSection />
