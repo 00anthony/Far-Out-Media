@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { client } from "@/src/sanity/lib/client";
+import ShellWrapper from "../components/ShellWrapper";
 import Navbar from "../components/Navbar";
+import type { NavbarData } from "../components/Navbar";
 import { footer } from "../sanity/schemaTypes/Footer"
 import Footer from "../components/Footer";
 import type { FooterData } from "../components/Footer";
@@ -53,17 +55,19 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const navbarData = await client.fetch(NAVBAR_QUERY);
-  const footerData: FooterData | null = await client.fetch(FOOTER_QUERY);
+  const [navbarData, footerData] = await Promise.all([
+    client.fetch<NavbarData | null>(NAVBAR_QUERY),
+    client.fetch<FooterData | null>(FOOTER_QUERY),
+  ]);
 
   return (
     <html lang="en" className="scroll-smooth overflow-x-hidden">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
       >
-        <Navbar data={navbarData ?? undefined} />
-        {children}
-        <Footer data={footerData ?? undefined} />
+        <ShellWrapper navbar={navbarData} footer={footerData}>
+          {children}
+        </ShellWrapper>
       </body>
     </html>
   );
