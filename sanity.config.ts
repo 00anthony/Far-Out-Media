@@ -19,6 +19,7 @@ import { featuredWork } from './src/sanity/schemaTypes/FeaturedWork'
 import { workProject } from './src/sanity/schemaTypes/workProject'
 import { about } from './src/sanity/schemaTypes/About'
 import { benefits } from './src/sanity/schemaTypes/Benefits'
+import { process } from './src/sanity/schemaTypes/Process'
 
 export default defineConfig({
   basePath: '/studio',
@@ -33,6 +34,7 @@ export default defineConfig({
     workProject,
     about, 
     benefits,
+    process, 
   ]},
   plugins: [
     structureTool({structure}),
