@@ -324,13 +324,6 @@ export default function Services({ data }: { data?: ServicesData | null }) {
           (hidden on desktop via md:hidden)
       ════════════════════════════════════ */}
       <div className="md:hidden relative z-10">
-        {videoPackages.length > 0 && (
-          <MobileScrollRow
-            packages={videoPackages}
-            accentColor={d.accentColor}
-            categoryLabel="Video Marketing · Full-Service"
-          />
-        )}
         {aerialPackages.length > 0 && (
           <MobileScrollRow
             packages={aerialPackages}
@@ -345,23 +338,6 @@ export default function Services({ data }: { data?: ServicesData | null }) {
           (hidden on mobile via hidden md:block)
       ════════════════════════════════════ */}
       <div className="hidden md:block container mx-auto px-6 md:px-12 relative z-10">
-        {videoPackages.length > 0 && (
-          <>
-            <CategoryLabel label="Video Marketing · Full-Service" inView={row1InView} />
-            <div ref={row1Ref} className="grid grid-cols-3 gap-6 mb-6 items-start">
-              {videoPackages.map((pkg, i) => (
-                <ServiceCard
-                  key={pkg._id}
-                  service={pkg}
-                  index={i}
-                  offsetY={OFFSETS[i] ?? 0}
-                  inView={row1InView}
-                  accentColor={d.accentColor}
-                />
-              ))}
-            </div>
-          </>
-        )}
 
         {aerialPackages.length > 0 && (
           <>
