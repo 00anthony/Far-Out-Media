@@ -169,8 +169,8 @@ export default async function HomePage() {
   const servicesData: ServicesData | null = packagesData
     ? {
         eyebrow: "Our Packages",
-        headingFirst: "Services &",
-        headingAccent: "Packages",
+        headingFirst: "Services ",
+        headingAccent: "& Packages",
         subheading: "Every package is built around your goals — from a single shoot to a full brand content suite.",
         accentColor: "#C2B280",
         ctaText: "Need something custom? Every project is different — let's build the right package for you.",

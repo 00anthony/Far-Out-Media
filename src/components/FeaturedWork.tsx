@@ -163,22 +163,32 @@ export default function FeaturedWork({ data }: { data?: FeaturedWorkData | null 
 
       {/* Header */}
       <div className="container mx-auto px-6 md:px-12">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
-          <div>
+        <div className=" mb-16 gap-8">
+          <div className="flex items-center gap-4 mb-6">
+            <div
+              style={{ transformOrigin: "left", background: `${d.accentColor}80` }}
+              className="h-px w-12"
+            />
             <span
-              className="text-xs font-bold tracking-[0.3em] uppercase mb-4 block"
+              className="text-xs font-bold tracking-[0.5em] uppercase "
               style={{ color: d.accentColor }}
             >
               {d.eyebrow}
             </span>
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tight">
-              {d.heading}
-            </h2>
           </div>
-          <p className="max-w-md text-white text-sm leading-relaxed">
-            {d.subheading}
-          </p>
+
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-linear-to-r from-white to-zinc-600">
+              {d.heading}
+              
+            </h2>
+            <p className="max-w-md text-white text-sm leading-relaxed">
+              {d.subheading}
+            </p>
+          </div>
+          
         </div>
+        
       </div>
 
       {/* ════════════════════════════════════

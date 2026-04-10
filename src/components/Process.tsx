@@ -118,8 +118,11 @@ export default function Process({ data }: { data?: ProcessData | null }) {
 
           {/* Heading row */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-            <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-none">
-              {d.heading}
+            <h2 className="overflow-visible text-5xl md:text-7xl font-black tracking-tighter leading-none">
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-white to-zinc-600">
+                {d.heading}
+              </span>
+              
             </h2>
             <span className="text-xs font-bold tracking-[0.4em] text-white uppercase self-center md:self-end">
               {d.subheading}

@@ -31,11 +31,13 @@ export interface ServicesData {
 
 /* ─────────────────────────────────────────────────────────────────────
    DEFAULTS
+
+   !!!SERVICES SECTION EDITABLE IN PAGE.TSX!!!
 ───────────────────────────────────────────────────────────────────── */
 const DEFAULTS: ServicesData = {
   eyebrow: "Our Packages",
-  headingFirst: "Services &",
-  headingAccent: "Packages",
+  headingFirst: "Services",
+  headingAccent: "& Packages",
   subheading: "Every package is built around your goals — from a single shoot to a full brand content suite.",
   accentColor: "#C2B280",
   ctaText: "Need something custom? Every project is different — let's build the right package for you.",
@@ -255,6 +257,8 @@ function MobileServiceCard({
 
 /* ─────────────────────────────────────────────────────────────────────
    SECTION
+
+   !!!SERVICES SECTION EDITABLE IN PAGE.TSX!!!
 ───────────────────────────────────────────────────────────────────── */
 export default function Services({ data }: { data?: ServicesData | null }) {
   const d: ServicesData = data ?? DEFAULTS;
@@ -304,6 +308,7 @@ export default function Services({ data }: { data?: ServicesData | null }) {
               {d.eyebrow}
             </span>
           </div>
+          {/* !!!SERVICES SECTION EDITABLE IN PAGE.TSX!!! */}
           <div className="flex flex-col gap-6">
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none">
               {d.headingFirst}
