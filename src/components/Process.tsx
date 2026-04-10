@@ -84,7 +84,7 @@ export default function Process({ data }: { data?: ProcessData | null }) {
         className="pointer-events-none absolute inset-0 flex items-center justify-center select-none"
         aria-hidden
       >
-        <span className="text-[22vw] font-black tracking-tighter text-white/2 uppercase leading-none whitespace-nowrap">
+        <span className="hidden md:block text-[22vw] font-black tracking-tighter text-white/2 uppercase leading-none whitespace-nowrap">
           Process
         </span>
       </motion.div>
