@@ -142,31 +142,7 @@ export default function Footer({ data }: { data?: FooterData | null }) {
         <div className="py-16 grid grid-cols-2 md:grid-cols-4 gap-12 border-b border-white/5">
 
           {/* Nav links */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.05, ease }}
-          >
-            <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white mb-6">
-              Navigate
-            </h4>
-            <ul className="space-y-3">
-              {d.navLinks.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="group flex items-center gap-2 text-sm text-zinc-500 hover:text-white transition-colors duration-200"
-                  >
-                    <span
-                      className="w-0 h-px transition-all duration-300 group-hover:w-4"
-                      style={{ background: d.accentColor }}
-                    />
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
+          
 
           {/* Contact */}
           <motion.div
@@ -245,7 +221,7 @@ export default function Footer({ data }: { data?: FooterData | null }) {
               </span>
             </div>
             <p className="text-[11px] text-zinc-600 leading-relaxed">
-              Charlotte, NC<br />& Worldwide
+              Charlotte, NC<br />
             </p>
           </motion.div>
 
