@@ -168,12 +168,12 @@ export default async function HomePage() {
   // `servicesSection` singleton and merge it here.
   const servicesData: ServicesData | null = packagesData
     ? {
-        eyebrow: "Our Packages",
-        headingFirst: "Services ",
-        headingAccent: "& Packages",
-        subheading: "Every package is built around your goals — from a single shoot to a full brand content suite.",
+        eyebrow: "Let's Create Something Far Out",
+        headingFirst: "Our",
+        headingAccent: "Services",
+        subheading: "Every video is built around your goals. From a single shoot to a full brand campaign.",
         accentColor: "#C2B280",
-        ctaText: "Need something custom? Every project is different — let's build the right package for you.",
+        ctaText: "Every project is different. Let’s build the right package for your goals.",
         ctaHref: "/services",
         ctaPrimaryLabel: "Get a Free Quote",
         ctaPrimaryHref: "/#contact",

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 
+
 /* ─────────────────────────────────────────────────────────────────────
    TYPES
 ───────────────────────────────────────────────────────────────────── */
@@ -58,34 +59,62 @@ const DEFAULTS: ServicesData = {
    ICON MAP
 ───────────────────────────────────────────────────────────────────── */
 const ICONS: Record<string, React.ReactNode> = {
-  Essentials: (
+  "Brand & Promotional Videos": (
     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
     </svg>
   ),
-  Growth: (
+  "Real Estate Marketing": (
     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
+        d="M3 10.5L12 3l9 7.5M5 9.5V21h14V9.5" />
     </svg>
   ),
-  "Brand Builder": (
+  "Event Coverage": (
     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 3l14 9-14 9V3z" />
+      {/* Outer calendar */}
+      <rect
+        x="3"
+        y="5"
+        width="18"
+        height="16"
+        rx="2"
+        strokeWidth="1.5"
+      />
+
+      {/* Top binding line */}
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="M3 9h18"
+      />
+
+      {/* Binding rings */}
+      <path
+        strokeLinecap="round"
+        strokeWidth="1.5"
+        d="M8 3v4M16 3v4"
+      />
     </svg>
   ),
-  Hover: (
+  "Social Media Content": (
     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+      <rect x="7" y="2" width="10" height="20" rx="2" strokeWidth="1.5"/>
+      <circle cx="12" cy="18" r="1" strokeWidth="1.5"/>
     </svg>
   ),
-  Elevate: (
+  "Aerial & Drone Production": (
     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+      <circle cx="12" cy="12" r="2" strokeWidth="1.5"/>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
+        d="M4 4h4M16 4h4M4 20h4M16 20h4M6 6l4 4M18 6l-4 4M6 18l4-4M18 18l-4-4" />
     </svg>
   ),
-  Skyline: (
+  "Custom Project": (
     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 3l14 9-14 9V3z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
+        d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8" />
     </svg>
   ),
 };
@@ -344,6 +373,24 @@ export default function Services({ data }: { data?: ServicesData | null }) {
       ════════════════════════════════════ */}
       <div className="hidden md:block container mx-auto px-6 md:px-12 relative z-10">
 
+        {videoPackages.length > 0 && (
+          <>
+            <CategoryLabel label="Video Marketing · Full-Service" inView={row1InView} />
+            <div ref={row1Ref} className="grid grid-cols-3 gap-6 mb-6 items-start">
+              {videoPackages.map((pkg, i) => (
+                <ServiceCard
+                  key={pkg._id}
+                  service={pkg}
+                  index={i}
+                  offsetY={OFFSETS[i] ?? 0}
+                  inView={row1InView}
+                  accentColor={d.accentColor}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
         {aerialPackages.length > 0 && (
           <>
             <CategoryLabel label="Aerial Marketing · Drone-Only" inView={row2InView} delay={0.1} />
@@ -374,6 +421,7 @@ export default function Services({ data }: { data?: ServicesData | null }) {
         >
           <p className="text-zinc-500 text-sm max-w-sm">{d.ctaText}</p>
           <div className="flex flex-col sm:flex-row items-center gap-4">
+            {/*
             <a
               href={d.ctaHref}
               className="group relative px-10 py-4 border border-white/10 text-white text-xs font-black uppercase tracking-[0.2em] overflow-hidden transition-all hover:border-[#C2B280]/50"
@@ -389,9 +437,10 @@ export default function Services({ data }: { data?: ServicesData | null }) {
                 </svg>
               </span>
             </a>
+            */}
             <a
               href={d.ctaPrimaryHref}
-              className="group relative px-10 py-4 bg-white text-black text-xs font-black uppercase tracking-[0.2em] overflow-hidden transition-all hover:scale-[1.02] active:scale-95"
+              className="group relative px-10 py-4 bg-[#C2B280] text-black text-xs font-black uppercase tracking-[0.2em] overflow-hidden transition-all hover:scale-[1.02] active:scale-95"
             >
               <span
                 className="absolute inset-0 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
@@ -447,7 +496,7 @@ function ServiceCard({ service, index, offsetY, inView, accentColor }: {
 
       <div className="p-8 flex flex-col flex-1">
         <div
-          className="mb-6 w-10 h-10 flex items-center justify-center border border-white/10 group-hover:border-[#C2B280]/40 transition-colors group-hover:-translate-y-1 transform duration-500"
+          className="mb-6 w-10 h-10 flex items-center justify-center border border-white/10 group-hover:border-[#C2B280]/40 transition-colors transform duration-500"
           style={{ color: accentColor }}
         >
           {icon}
@@ -466,8 +515,8 @@ function ServiceCard({ service, index, offsetY, inView, accentColor }: {
           ))}
         </ul>
 
-        <a href="/services" className="mt-auto flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase text-white/30 group-hover:text-[#C2B280] transition-colors duration-300">
-          See Details
+        <a href="/#contact" className="mt-auto flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase text-white/30 group-hover:text-[#C2B280] transition-colors duration-300">
+          Learn More
           <svg className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
