@@ -210,7 +210,7 @@ export default function Navbar({ data }: { data?: NavbarData | null }) {
                 {d.ctaLabel}
               </a>
               <p className="text-center text-[10px] tracking-[0.4em] uppercase text-zinc-600">
-                Charlotte, NC &amp; Worldwide
+                Charlotte, NC 
               </p>
             </motion.div>
           </motion.div>

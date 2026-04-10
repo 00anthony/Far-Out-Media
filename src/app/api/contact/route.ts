@@ -135,7 +135,7 @@ function buildInternalEmail({
           <tr><td style="padding-top:32px;">${allRows}</td></tr>
           <tr><td style="padding-top:40px;border-top:1px solid #27272a;">
             <p style="margin:0;font-size:11px;color:#52525b;letter-spacing:0.3em;text-transform:uppercase;">
-              Sent via faroutmedia.com · Charlotte, NC &amp; Worldwide
+              Sent via faroutmedia.com · Charlotte, NC 
             </p>
           </td></tr>
         </table>
@@ -179,7 +179,7 @@ function buildAutoReplyEmail({ name, projectType }: { name: string; projectType:
           <tr><td>
             <p style="margin:0 0 8px;font-size:13px;color:#ffffff;font-weight:700;">Far Out Media</p>
             <p style="margin:0;font-size:12px;color:#52525b;line-height:1.7;">
-              Charlotte, NC &amp; Worldwide<br />
+              Charlotte, NC <br />
               <a href="https://faroutmedia.com" style="color:#C2B280;text-decoration:none;">faroutmedia.com</a>
             </p>
             <p style="margin:16px 0 0;font-size:11px;color:#3f3f46;">

@@ -63,7 +63,7 @@ export const contactSection = defineType({
       title: "Footer — Left Text",
       type: "string",
       group: "text",
-      initialValue: "Serving Charlotte, NC & Worldwide",
+      initialValue: "Serving Charlotte, NC",
     }),
     defineField({
       name: "footerRight",
