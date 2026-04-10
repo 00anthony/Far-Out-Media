@@ -46,10 +46,34 @@ const FOOTER_QUERY = `*[_type == "footer"][0] {
 }`;
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://faroutmediaco.com"),
+
   title: "Far Out Media | Premium Videography Services in Charlotte",
-  description: "Videography built on quality, reliability, and value.",
+  description: "Premium videography services in Charlotte specializing in real estate, events, and social media content. High-quality visuals that elevate your brand.",
+  keywords: [
+    "videography Charlotte",
+    "real estate videography",
+    "event videography",
+    "drone videography",
+    "social media content creation",
+  ],
   icons: {
       icon: "/Far-Out-Media-Logo-1024x1014.jpg", // 👈 points to your new PNG
+  },
+
+  openGraph: {
+    title: "Far Out Media | Premium Videography Services in Charlotte",
+    description:
+      "Premium videography services in Charlotte specializing in real estate, events, and social media content. High-quality visuals that elevate your brand.",
+    images: ['/Far-Out-Media-Logo-1024x1014.jpg'],
+  },
+
+  twitter: {
+    card: 'summary_large_image',
+    title: "Far Out Media | Premium Videography Services in Charlotte",
+    description:
+      "Premium videography services in Charlotte specializing in real estate, events, and social media content. High-quality visuals that elevate your brand.",
+    images: ['/Far-Out-Media-Logo-1024x1014.jpg'],
   },
 };
 
