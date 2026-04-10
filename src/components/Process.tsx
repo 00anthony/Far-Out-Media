@@ -121,7 +121,7 @@ export default function Process({ data }: { data?: ProcessData | null }) {
             <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-none">
               {d.heading}
             </h2>
-            <span className="text-xs font-bold tracking-[0.4em] text-zinc-600 uppercase self-center md:self-end">
+            <span className="text-xs font-bold tracking-[0.4em] text-white uppercase self-center md:self-end">
               {d.subheading}
             </span>
           </div>

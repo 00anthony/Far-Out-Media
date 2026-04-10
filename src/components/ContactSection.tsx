@@ -175,7 +175,7 @@ export default function ContactSection({ data }: { data?: ContactSectionData | n
           </motion.h2>
 
           {/* Subheading */}
-          <motion.p variants={fadeUp} className="text-zinc-400 text-base md:text-lg max-w-xl mb-16 leading-relaxed">
+          <motion.p variants={fadeUp} className="text-white text-base md:text-lg max-w-xl mb-16 leading-relaxed">
             {d.subheading}
           </motion.p>
 

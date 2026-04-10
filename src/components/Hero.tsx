@@ -146,7 +146,7 @@ export default function Hero({ data }: { data?: HeroData | null }) {
         </h1>
 
         {/* Subheading */}
-        <p className="font-inter max-w-xl mx-auto text-gray-400 text-sm md:text-lg mb-12 font-medium leading-relaxed tracking-wide">
+        <p className="font-inter max-w-xl mx-auto text-white text-sm md:text-lg mb-12 font-medium leading-relaxed tracking-wide">
           {d.subheading}
         </p>
 

@@ -78,7 +78,7 @@ export default function Benefits({ data }: { data?: BenefitsData | null }) {
                 >
                   {benefit.value}
                 </span>
-                <p className="text-gray-400 font-medium">{benefit.body}</p>
+                <p className="text-white font-medium">{benefit.body}</p>
               </div>
             ))}
           </div>

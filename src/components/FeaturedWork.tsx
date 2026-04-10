@@ -175,7 +175,7 @@ export default function FeaturedWork({ data }: { data?: FeaturedWorkData | null 
               {d.heading}
             </h2>
           </div>
-          <p className="max-w-md text-gray-500 text-sm leading-relaxed">
+          <p className="max-w-md text-white text-sm leading-relaxed">
             {d.subheading}
           </p>
         </div>

@@ -85,7 +85,7 @@ export default function About({ data }: { data?: AboutData | null }) {
             </h2>
 
             {/* Body paragraphs — driven by the array from Sanity */}
-            <div className="space-y-6 text-gray-400 text-lg font-light leading-relaxed">
+            <div className="space-y-6 text-white text-lg font-light leading-relaxed">
               {d.paragraphs.map((para, i) => (
                 <p key={i}>{para}</p>
               ))}

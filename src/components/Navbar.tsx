@@ -90,7 +90,7 @@ export default function Navbar({ data }: { data?: NavbarData | null }) {
           {/* Right side (Nav + CTA) */}
           <div className="flex items-center gap-24">
             {/* ── Desktop nav ── */}
-            <nav className="hidden md:flex space-x-20 text-xs font-semibold tracking-widest uppercase text-gray-400">
+            <nav className="hidden md:flex space-x-20 text-xs font-semibold tracking-widest uppercase text-white">
               {d.links.map((link) => (
                 <a
                   key={link.href}

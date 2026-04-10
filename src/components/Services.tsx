@@ -228,7 +228,7 @@ function MobileServiceCard({
 
         <ul className="space-y-2 mb-6 flex-1">
           {service.bullets.map((b, i) => (
-            <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-500">
+            <li key={i} className="flex items-start gap-2.5 text-xs text-white">
               <span
                 className="mt-1 w-1 h-1 rounded-full shrink-0"
                 style={{ background: `${accentColor}99` }}
@@ -312,7 +312,7 @@ export default function Services({ data }: { data?: ServicesData | null }) {
                 {d.headingAccent}
               </span>
             </h2>
-            <p className="text-zinc-500 text-sm">
+            <p className="text-white text-sm">
               {d.subheading}
             </p>
           </div>
@@ -454,7 +454,7 @@ function ServiceCard({ service, index, offsetY, inView, accentColor }: {
 
         <ul className="space-y-2 mb-8 flex-1">
           {service.bullets.map((b, i) => (
-            <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-500">
+            <li key={i} className="flex items-start gap-2.5 text-xs text-white">
               <span className="mt-1 w-1 h-1 rounded-full shrink-0" style={{ background: `${accentColor}99` }} />
               {b}
             </li>

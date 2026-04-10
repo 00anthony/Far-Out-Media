@@ -129,7 +129,7 @@ export default function Testimonials({ data }: { data?: TestimonialsData | null 
                   Clients Say.
                 </span>
               </h2>
-              <p className="text-zinc-600 text-xs tracking-[0.3em] uppercase max-w-xs md:text-right">
+              <p className="text-white text-xs tracking-[0.3em] uppercase max-w-xs md:text-right">
                 Real results from real brands
               </p>
             </div>
