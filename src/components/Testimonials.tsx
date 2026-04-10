@@ -48,7 +48,7 @@ const DEFAULTS: TestimonialsData = {
 };
 
 const ease = [0.16, 1, 0.3, 1] as const;
-const OFFSETS = [0, 32, 16]; // desktop stagger offsets
+const OFFSETS = [0, 0, 0]; // desktop stagger offsets
 
 /* ─────────────────────────────────────────────────────────────────────
    COMPONENT
@@ -254,7 +254,7 @@ function TestimonialCard({
         }}
       />
 
-      <div className="p-8 flex flex-col flex-1">
+      <div className="p-8 flex flex-col flex-1 min-h-84">
         {/* Decorative quote mark */}
         <span
           className="block text-6xl font-black leading-none select-none"
