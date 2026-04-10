@@ -69,7 +69,7 @@ export default function Benefits({ data }: { data?: BenefitsData | null }) {
           </div>
 
           {/* Benefits grid — columns derived from ordered Sanity array */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-16">
             {d.benefits.map((benefit, i) => (
               <div key={i} className="p-8 border-l border-white/10 space-y-4">
                 <span
@@ -84,14 +84,7 @@ export default function Benefits({ data }: { data?: BenefitsData | null }) {
           </div>
 
           {/* Callout box */}
-          <div className="mt-20 p-12 bg-zinc-900/50 text-center border border-white/5">
-            <h3 className="font-inter text-2xl font-bold mb-4 tracking-tight">
-              {d.calloutHeading}
-            </h3>
-            <p className="text-gray-500 font-inter max-w-2xl mx-auto italic">
-              &ldquo;{d.calloutQuote}&rdquo;
-            </p>
-          </div>
+          
 
         </div>
       </div>
