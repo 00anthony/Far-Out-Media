@@ -48,6 +48,9 @@ const FOOTER_QUERY = `*[_type == "footer"][0] {
 export const metadata: Metadata = {
   title: "Far Out Media | Premium Videography Services in Charlotte",
   description: "Videography built on quality, reliability, and value.",
+  icons: {
+      icon: "/Far-Out-Media-Logo-1024x1014.jpg", // 👈 points to your new PNG
+  },
 };
 
 export default async function RootLayout({
