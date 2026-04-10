@@ -60,7 +60,7 @@ const DEFAULTS: ContactSectionData = {
   successHeading: "Message Received.",
   successBody: "We'll review your project and reach out within 24 hours. Get ready for something far out.",
   successFooter: "Far Out Media · Charlotte, NC",
-  footerLeft: "Serving Charlotte, NC & Worldwide",
+  footerLeft: "Serving Charlotte, NC",
   footerRight: "Currently Accepting Projects",
 };
 
@@ -200,6 +200,32 @@ export default function ContactSection({ data }: { data?: ContactSectionData | n
                 exit={{ opacity: 0 }}
                 className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10"
               >
+                {/* Project type pills */}
+                {d.projectTypes.length > 0 && (
+                  <motion.div variants={fadeUp} className="flex flex-col gap-3 md:col-span-2">
+                    <span className="text-[10px] tracking-[0.35em] uppercase text-zinc-500 font-semibold">
+                      Project Type
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {d.projectTypes.map((type) => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => setFormData((prev) => ({ ...prev, projectType: type }))}
+                          className="cursor-pointer px-3 py-1.5 text-[11px] tracking-widest uppercase font-semibold border transition-all duration-200"
+                          style={
+                            formData.projectType === type
+                              ? { borderColor: d.accentColor, color: d.accentColor, background: `${d.accentColor}1a` }
+                              : { borderColor: "#3f3f46", color: "#71717a" }
+                          }
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+                
                 {/* Dynamic fields from Sanity */}
                 {d.formFields.map((field) => (
                   <motion.div
@@ -244,31 +270,7 @@ export default function ContactSection({ data }: { data?: ContactSectionData | n
                   </motion.div>
                 ))}
 
-                {/* Project type pills */}
-                {d.projectTypes.length > 0 && (
-                  <motion.div variants={fadeUp} className="flex flex-col gap-3 md:col-span-2">
-                    <span className="text-[10px] tracking-[0.35em] uppercase text-zinc-500 font-semibold">
-                      Project Type
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                      {d.projectTypes.map((type) => (
-                        <button
-                          key={type}
-                          type="button"
-                          onClick={() => setFormData((prev) => ({ ...prev, projectType: type }))}
-                          className="cursor-pointer px-3 py-1.5 text-[11px] tracking-widest uppercase font-semibold border transition-all duration-200"
-                          style={
-                            formData.projectType === type
-                              ? { borderColor: d.accentColor, color: d.accentColor, background: `${d.accentColor}1a` }
-                              : { borderColor: "#3f3f46", color: "#71717a" }
-                          }
-                        >
-                          {type}
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
+                
 
                 {/* Error */}
                 <AnimatePresence>
@@ -291,7 +293,7 @@ export default function ContactSection({ data }: { data?: ContactSectionData | n
                 >
                   <SubmitButton label={d.submitLabel} loading={formState === "loading"} accentColor={d.accentColor} />
                   <p className="text-zinc-600 text-xs tracking-[0.3em] uppercase">
-                    No commitment · 24-hour response
+                    48-hour response
                   </p>
                 </motion.div>
               </motion.form>
