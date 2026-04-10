@@ -31,7 +31,7 @@ const DEFAULTS: NavbarData = {
   links: [
     { label: "Work",     href: "/#work" },
     { label: "About",    href: "/#about" },
-    { label: "Services", href: "/services" },
+    { label: "Services", href: "/#services" },
     { label: "Process",  href: "/#process" },
   ],
   ctaLabel: "Get a Quote",
