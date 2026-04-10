@@ -270,11 +270,11 @@ function MobileServiceCard({
         </ul>
 
         <a
-          href="/services"
+          href="/#contact"
           className="mt-auto flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase transition-colors duration-300"
           style={{ color: `${accentColor}70` }}
         >
-          See Details
+          Learn More
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
@@ -358,11 +358,11 @@ export default function Services({ data }: { data?: ServicesData | null }) {
           (hidden on desktop via md:hidden)
       ════════════════════════════════════ */}
       <div className="md:hidden relative z-10">
-        {aerialPackages.length > 0 && (
+        {videoPackages.length > 0 && (
           <MobileScrollRow
-            packages={aerialPackages}
+            packages={videoPackages}
             accentColor={d.accentColor}
-            categoryLabel="Aerial Marketing · Drone-Only"
+            categoryLabel="Video Marketing · Full-Service"
           />
         )}
       </div>
@@ -421,7 +421,7 @@ export default function Services({ data }: { data?: ServicesData | null }) {
         >
           <p className="text-zinc-500 text-sm max-w-sm">{d.ctaText}</p>
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            {/*
+            {/* OLD SERVICES PAGE BUTTON
             <a
               href={d.ctaHref}
               className="group relative px-10 py-4 border border-white/10 text-white text-xs font-black uppercase tracking-[0.2em] overflow-hidden transition-all hover:border-[#C2B280]/50"
