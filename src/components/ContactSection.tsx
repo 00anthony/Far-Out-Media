@@ -169,7 +169,7 @@ export default function ContactSection({ data }: { data?: ContactSectionData | n
           {/* Heading */}
           <motion.h2 variants={fadeUp} className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-none">
             {d.headingFirst} <br />
-            <span className="text-transparent bg-clip-text bg-linear-to-b from-white to-zinc-600">
+            <span className="pr-2 text-transparent bg-clip-text bg-linear-to-b from-white to-zinc-600">
               {d.headingAccent}
             </span>
           </motion.h2>

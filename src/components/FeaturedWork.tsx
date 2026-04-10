@@ -178,7 +178,7 @@ export default function FeaturedWork({ data }: { data?: FeaturedWorkData | null 
           </div>
 
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-            <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-linear-to-r from-white to-zinc-600">
+            <h2 className="pr-2 text-4xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-linear-to-r from-white to-zinc-600">
               {d.heading}
               
             </h2>

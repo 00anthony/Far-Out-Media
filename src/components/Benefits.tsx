@@ -58,7 +58,7 @@ export default function Benefits({ data }: { data?: BenefitsData | null }) {
 
           {/* Heading */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-center gap-6">
-            <h2 className="text-4xl text-center md:text-6xl font-black tracking-tighter leading-none">
+            <h2 className="pr-2 text-4xl text-center md:text-6xl font-black tracking-tighter leading-none">
               {d.headingFirst}
               <br />
               <span className="text-transparent bg-clip-text bg-linear-to-r from-white to-zinc-500">

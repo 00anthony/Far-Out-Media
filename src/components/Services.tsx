@@ -313,7 +313,7 @@ export default function Services({ data }: { data?: ServicesData | null }) {
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none">
               {d.headingFirst}
               <br />
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-white to-zinc-500">
+              <span className="pr-2 text-transparent bg-clip-text bg-linear-to-r from-white to-zinc-500">
                 {d.headingAccent}
               </span>
             </h2>

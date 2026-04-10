@@ -125,8 +125,8 @@ export default function Testimonials({ data }: { data?: TestimonialsData | null 
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
               <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none">
                 What Our <br />
-                <span className="text-transparent bg-clip-text bg-linear-to-r from-white to-zinc-600">
-                  Clients Say.
+                <span className="pr-2 text-transparent bg-clip-text bg-linear-to-r from-white to-zinc-600">
+                  Clients Say 
                 </span>
               </h2>
               <p className="text-white text-xs tracking-[0.3em] uppercase max-w-xs md:text-right">

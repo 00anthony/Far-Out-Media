@@ -76,10 +76,10 @@ export default function About({ data }: { data?: AboutData | null }) {
             </span>
 
             {/* Heading */}
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1]">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1]">
               {d.headingFirst}
               {d.headingFirst && <br />}
-              <span className="serif italic font-normal text-gray-400">
+              <span className="pr-2 font-black text-transparent bg-clip-text bg-linear-to-b from-white to-zinc-600">
                 {d.headingAccent}
               </span>
             </h2>
