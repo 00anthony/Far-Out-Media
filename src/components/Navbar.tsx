@@ -68,7 +68,7 @@ export default function Navbar({ data }: { data?: NavbarData | null }) {
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 font-inter ${
           scrolled || menuOpen
-            ? "bg-black/90 backdrop-blur-lg border-b border-neutral-500/10 py-4"
+            ? "bg-black/50 backdrop-blur-lg border-b border-neutral-500/10 py-4"
             : "bg-transparent py-6 border-b border-white/0"
         }`}
       >
@@ -87,64 +87,67 @@ export default function Navbar({ data }: { data?: NavbarData | null }) {
             </span>
           </a>
 
-          {/* ── Desktop nav ── */}
-          <nav className="hidden md:flex space-x-10 text-xs font-semibold tracking-widest uppercase text-gray-400">
-            {d.links.map((link) => (
+          {/* Right side (Nav + CTA) */}
+          <div className="flex items-center gap-24">
+            {/* ── Desktop nav ── */}
+            <nav className="hidden md:flex space-x-20 text-xs font-semibold tracking-widest uppercase text-gray-400">
+              {d.links.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="hover:text-white transition-colors duration-200"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </nav>
+
+            {/* ── Desktop CTA + Mobile hamburger ── */}
+            <div className="flex items-center gap-4">
               <a
-                key={link.href}
-                href={link.href}
-                className="hover:text-white transition-colors duration-200"
+                href={d.ctaHref}
+                className="hidden md:inline-block px-6 py-2 border border-white/20 text-xs font-bold tracking-widest uppercase transition-all duration-300"
+                style={
+                  {
+                    "--accent": d.accentColor,
+                  } as React.CSSProperties
+                }
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = d.accentColor;
+                  (e.currentTarget as HTMLElement).style.color = d.accentColor;
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.2)";
+                  (e.currentTarget as HTMLElement).style.color = "";
+                }}
               >
-                {link.label}
+                {d.ctaLabel}
               </a>
-            ))}
-          </nav>
 
-          {/* ── Desktop CTA + Mobile hamburger ── */}
-          <div className="flex items-center gap-4">
-            <a
-              href={d.ctaHref}
-              className="hidden md:inline-block px-6 py-2 border border-white/20 text-xs font-bold tracking-widest uppercase transition-all duration-300"
-              style={
-                {
-                  "--accent": d.accentColor,
-                } as React.CSSProperties
-              }
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.borderColor = d.accentColor;
-                (e.currentTarget as HTMLElement).style.color = d.accentColor;
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.2)";
-                (e.currentTarget as HTMLElement).style.color = "";
-              }}
-            >
-              {d.ctaLabel}
-            </a>
-
-            {/* Hamburger button — mobile only */}
-            <button
-              onClick={() => setMenuOpen((o) => !o)}
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={menuOpen}
-              className="md:hidden relative z-10 w-8 h-8 flex flex-col justify-center items-center gap-1.5"
-            >
-              <motion.span
-                animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-                transition={{ duration: 0.3, ease }}
-                className="block w-6 h-px bg-white origin-center"
-              />
-              <motion.span
-                animate={menuOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
-                transition={{ duration: 0.2 }}
-                className="block w-6 h-px bg-white"
-              />
-              <motion.span
-                animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-                transition={{ duration: 0.3, ease }}
-                className="block w-6 h-px bg-white origin-center"
-              />
-            </button>
+              {/* Hamburger button — mobile only */}
+              <button
+                onClick={() => setMenuOpen((o) => !o)}
+                aria-label={menuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={menuOpen}
+                className="md:hidden relative z-10 w-8 h-8 flex flex-col justify-center items-center gap-1.5"
+              >
+                <motion.span
+                  animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
+                  transition={{ duration: 0.3, ease }}
+                  className="block w-6 h-px bg-white origin-center"
+                />
+                <motion.span
+                  animate={menuOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
+                  transition={{ duration: 0.2 }}
+                  className="block w-6 h-px bg-white"
+                />
+                <motion.span
+                  animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
+                  transition={{ duration: 0.3, ease }}
+                  className="block w-6 h-px bg-white origin-center"
+                />
+              </button>
+            </div>
           </div>
         </div>
       </nav>
