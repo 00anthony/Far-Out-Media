@@ -90,7 +90,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className="scroll-smooth overflow-x-hidden">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased selection:bg-[#C2B280]/30`}
       >
         <ShellWrapper navbar={navbarData} footer={footerData}>
           {children}
