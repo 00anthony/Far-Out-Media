@@ -104,7 +104,7 @@ const ICONS: Record<string, React.ReactNode> = {
       <circle cx="12" cy="18" r="1" strokeWidth="1.5"/>
     </svg>
   ),
-  "Aerial & Drone Production": (
+  "Drone Footage": (
     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="2" strokeWidth="1.5"/>
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
@@ -126,7 +126,7 @@ const FALLBACK_ICON = (
   </svg>
 );
 
-const OFFSETS = [0, 40, 80];
+const OFFSETS = [0, 0, 0];
 const ease = [0.16, 1, 0.3, 1] as const;
 
 /* ─────────────────────────────────────────────────────────────────────
@@ -260,10 +260,13 @@ function MobileServiceCard({
         <ul className="space-y-2 mb-6 flex-1">
           {service.bullets.map((b, i) => (
             <li key={i} className="flex items-start gap-2.5 text-xs text-white">
+              {/* 
               <span
                 className="mt-1 w-1 h-1 rounded-full shrink-0"
                 style={{ background: `${accentColor}99` }}
               />
+              */}
+              
               {b}
             </li>
           ))}
@@ -274,7 +277,7 @@ function MobileServiceCard({
           className="mt-auto flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase transition-colors duration-300"
           style={{ color: `${accentColor}70` }}
         >
-          Learn More
+          Interested?
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
@@ -509,14 +512,14 @@ function ServiceCard({ service, index, offsetY, inView, accentColor }: {
         <ul className="space-y-2 mb-8 flex-1">
           {service.bullets.map((b, i) => (
             <li key={i} className="flex items-start gap-2.5 text-xs text-white">
-              <span className="mt-1 w-1 h-1 rounded-full shrink-0" style={{ background: `${accentColor}99` }} />
+              {/*<span className="mt-1 w-1 h-1 rounded-full shrink-0" style={{ background: `${accentColor}99` }} /> */}
               {b}
             </li>
           ))}
         </ul>
 
         <a href="/#contact" className="mt-auto flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase text-white/30 group-hover:text-[#C2B280] transition-colors duration-300">
-          Learn More
+          Interested?
           <svg className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
