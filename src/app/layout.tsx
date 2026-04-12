@@ -58,14 +58,14 @@ export const metadata: Metadata = {
     "social media content creation",
   ],
   icons: {
-      icon: "/Far-Out-Media-Logo-1024x1014.jpg", // 👈 points to your new PNG
+      icon: "/Far-Out-Media-Logo.svg", // 👈 points to your new PNG
   },
 
   openGraph: {
     title: "Far Out Media | Premium Videography Services in Charlotte",
     description:
       "Premium videography services in Charlotte specializing in real estate, events, and social media content. High-quality visuals that elevate your brand.",
-    images: ['/Far-Out-Media-Logo-1024x1014.jpg'],
+    images: ['/Far-Out-Media-Logo.svg'],
   },
 
   twitter: {
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
     title: "Far Out Media | Premium Videography Services in Charlotte",
     description:
       "Premium videography services in Charlotte specializing in real estate, events, and social media content. High-quality visuals that elevate your brand.",
-    images: ['/Far-Out-Media-Logo-1024x1014.jpg'],
+    images: ['/Far-Out-Media-Logo.svg'],
   },
 };
 
