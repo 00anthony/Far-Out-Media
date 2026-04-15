@@ -16,11 +16,12 @@ export interface ProjectData {
   thumbnail: string;
   thumbnailAlt: string;
   videoEmbedUrl: string | null;
-  videoProvider: "vimeo" | "youtube" | null;
+  /** Direct CDN URL for self-hosted video files uploaded to Sanity */
+  videoFileUrl: string | null;
+  videoProvider: "vimeo" | "youtube" | "self-hosted" | null;
   slug: string;
   seoTitle: string | null;
   seoDescription: string | null;
-  // Adjacent projects for prev/next navigation
   prevProject: { title: string; slug: string; thumbnail: string } | null;
   nextProject: { title: string; slug: string; thumbnail: string } | null;
 }
@@ -39,6 +40,7 @@ const PROJECT_QUERY = `
     "thumbnail":    thumbnail.asset->url,
     thumbnailAlt,
     videoEmbedUrl,
+    "videoFileUrl": videoFile.asset->url,
     videoProvider,
     "slug":         slug.current,
     seoTitle,
@@ -46,7 +48,6 @@ const PROJECT_QUERY = `
   }
 `;
 
-// Fetch all slugs for static generation + prev/next lookup
 const ALL_SLUGS_QUERY = `
   *[_type == "workProject"] | order(_createdAt asc) {
     "slug": slug.current,
@@ -56,7 +57,7 @@ const ALL_SLUGS_QUERY = `
 `;
 
 /* ─────────────────────────────────────────────────────────────────────
-   STATIC PARAMS — pre-builds every project page at build time
+   STATIC PARAMS
 ───────────────────────────────────────────────────────────────────── */
 export async function generateStaticParams() {
   const slugs: { slug: string }[] = await client.fetch(ALL_SLUGS_QUERY);
@@ -64,19 +65,15 @@ export async function generateStaticParams() {
 }
 
 /* ─────────────────────────────────────────────────────────────────────
-   METADATA — dynamic SEO per project
+   METADATA
 ───────────────────────────────────────────────────────────────────── */
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>; // ← Promise, not plain object
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params; // ← await it
-
-  const project: ProjectData | null = await client.fetch(
-    PROJECT_QUERY,
-    { slug } // ← now slug is the actual string
-  );
+  const { slug } = await params;
+  const project: ProjectData | null = await client.fetch(PROJECT_QUERY, { slug });
 
   if (!project) return { title: "Project Not Found" };
 
@@ -100,15 +97,13 @@ export const revalidate = 3600;
 export default async function ProjectPage({
   params,
 }: {
-  params: Promise<{ slug: string }>; // ← Promise, not plain object
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params; // ← await it
+  const { slug } = await params;
 
   const [project, allProjects] = await Promise.all([
-    client.fetch<ProjectData | null>(PROJECT_QUERY, { slug }), // ← slug string
-    client.fetch<{ slug: string; title: string; thumbnail: string }[]>(
-      ALL_SLUGS_QUERY
-    ),
+    client.fetch<ProjectData | null>(PROJECT_QUERY, { slug }),
+    client.fetch<{ slug: string; title: string; thumbnail: string }[]>(ALL_SLUGS_QUERY),
   ]);
 
   if (!project) notFound();
@@ -116,9 +111,7 @@ export default async function ProjectPage({
   const currentIndex = allProjects.findIndex((p) => p.slug === slug);
   const prevProject = currentIndex > 0 ? allProjects[currentIndex - 1] : null;
   const nextProject =
-    currentIndex < allProjects.length - 1
-      ? allProjects[currentIndex + 1]
-      : null;
+    currentIndex < allProjects.length - 1 ? allProjects[currentIndex + 1] : null;
 
   return <ProjectClient project={{ ...project, prevProject, nextProject }} />;
 }

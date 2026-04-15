@@ -80,8 +80,6 @@ export const workProject = defineType({
     }),
 
     // Short silent looping clip — plays on card hover.
-    // Keep this under 3MB. Export as a heavily compressed MP4,
-    // 5–10 seconds, no audio, ~720p max.
     defineField({
       name: "previewVideoMp4",
       title: "Hover Preview Clip — MP4",
@@ -100,25 +98,46 @@ export const workProject = defineType({
       description: "Smaller file for desktop/Android. iOS falls back to MP4.",
     }),
 
-    // The full film — embed from Vimeo or YouTube rather than
-    // uploading to Sanity to avoid large file storage costs.
+    // ── Video source (choose ONE of the two approaches below) ─────────
+    //
+    // Option A — Embed URL (Vimeo / YouTube)
+    // Use this for finished films already hosted on a video platform.
+    // No storage cost, best quality, supports captions/chapters.
     defineField({
       name: "videoEmbedUrl",
-      title: "Full Video Embed URL",
+      title: "Full Video Embed URL  (Option A — Vimeo / YouTube)",
       type: "url",
       group: "media",
       description:
-        'Vimeo or YouTube embed URL. e.g. "https://player.vimeo.com/video/123456789" or "https://www.youtube.com/embed/abc123". Shown on the project detail page.',
+        'Vimeo or YouTube embed URL. e.g. "https://player.vimeo.com/video/123456789" or "https://www.youtube.com/embed/abc123". Leave blank if uploading the file directly below.',
     }),
+
+    // Option B — Self-hosted file upload
+    // Upload the MP4 directly to Sanity's asset CDN.
+    // Good for private / unlisted films, or when a platform account isn't needed.
+    // ⚠️  Large files will count against your Sanity asset quota — compress before uploading.
+    defineField({
+      name: "videoFile",
+      title: "Full Video File  (Option B — upload from computer)",
+      type: "file",
+      group: "media",
+      options: { accept: "video/mp4,video/webm,video/ogg" },
+      description:
+        "Upload an MP4/WebM directly. Used when no embed URL is set. Compress to <500MB before uploading.",
+    }),
+
     defineField({
       name: "videoProvider",
       title: "Video Provider",
       type: "string",
       group: "media",
+      description:
+        'Set to "Self-hosted" when using the file upload above, or the matching platform for an embed URL.',
       options: {
         list: [
-          { title: "Vimeo",   value: "vimeo" },
-          { title: "YouTube", value: "youtube" },
+          { title: "Vimeo",       value: "vimeo" },
+          { title: "YouTube",     value: "youtube" },
+          { title: "Self-hosted", value: "self-hosted" },
         ],
         layout: "radio",
       },

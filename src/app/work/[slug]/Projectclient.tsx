@@ -1,6 +1,7 @@
+// app/work/[slug]/Projectclient.tsx
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import type { ProjectData } from "./page";
 
@@ -12,11 +13,8 @@ export default function ProjectClient({ project: p }: { project: ProjectData }) 
   const heroRef = useRef<HTMLDivElement>(null);
   const infoRef = useRef<HTMLDivElement>(null);
 
-  // Build the correct embed URL with autoplay + quality params
   const embedUrl = buildEmbedUrl(p.videoEmbedUrl, p.videoProvider);
-
-  // Fade in the iframe once it loads to avoid a flash of black
-  const handleIframeLoad = () => setPlayerReady(true);
+  const isSelfHosted = p.videoProvider === "self-hosted" && !!p.videoFileUrl;
 
   return (
     <main className="min-h-screen bg-[#080808] text-white selection:bg-[#C2B280]/30">
@@ -48,16 +46,16 @@ export default function ProjectClient({ project: p }: { project: ProjectData }) 
           </svg>
           Go Home
         </a>
-
       </motion.div>
 
       {/* ════════════════════════════════════
           VIDEO PLAYER
       ════════════════════════════════════ */}
       <section ref={heroRef} className="relative w-full pt-0">
-        {embedUrl ? (
-          <div className="relative w-full bg-black" style={{ paddingBottom: "56.25%" /* 16:9 */ }}>
-            {/* Thumbnail shown while iframe loads */}
+
+        {/* ── A: Self-hosted file from Sanity CDN ── */}
+        {isSelfHosted ? (
+          <div className="relative w-full bg-black" style={{ paddingBottom: "56.25%" }}>
             {!playerReady && (
               <div className="absolute inset-0 z-10">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -75,7 +73,41 @@ export default function ProjectClient({ project: p }: { project: ProjectData }) 
                 </div>
               </div>
             )}
+            <video
+              className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${
+                playerReady ? "opacity-100" : "opacity-0"
+              }`}
+              controls
+              playsInline
+              preload="metadata"
+              poster={p.thumbnail}
+              onCanPlay={() => setPlayerReady(true)}
+            >
+              <source src={p.videoFileUrl!} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
 
+        /* ── B: Vimeo / YouTube embed ── */
+        ) : embedUrl ? (
+          <div className="relative w-full bg-black" style={{ paddingBottom: "56.25%" }}>
+            {!playerReady && (
+              <div className="absolute inset-0 z-10">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={p.thumbnail}
+                  alt={p.thumbnailAlt}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center animate-pulse">
+                    <svg className="w-6 h-6 ml-1" fill="white" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            )}
             <iframe
               ref={iframeRef}
               src={embedUrl}
@@ -84,12 +116,13 @@ export default function ProjectClient({ project: p }: { project: ProjectData }) 
               }`}
               allow="autoplay; fullscreen; picture-in-picture"
               allowFullScreen
-              onLoad={handleIframeLoad}
+              onLoad={() => setPlayerReady(true)}
               title={p.title}
             />
           </div>
+
+        /* ── C: No video — thumbnail placeholder ── */
         ) : (
-          /* No embed URL — show a full-bleed thumbnail with an overlay */
           <div className="relative w-full aspect-video bg-zinc-900 overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -121,7 +154,6 @@ export default function ProjectClient({ project: p }: { project: ProjectData }) 
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.7, ease }}
               >
-                {/* Eyebrow */}
                 <div className="flex items-center gap-4 mb-6">
                   <div className="h-px w-8 bg-[#C2B280]/50" />
                   <span className="text-[#C2B280] text-[10px] font-bold tracking-[0.5em] uppercase">
@@ -129,12 +161,10 @@ export default function ProjectClient({ project: p }: { project: ProjectData }) 
                   </span>
                 </div>
 
-                {/* Title */}
                 <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none mb-10">
                   {p.title}
                 </h1>
 
-                {/* Description */}
                 {p.description && (
                   <p className="text-zinc-400 text-base md:text-lg leading-relaxed max-w-2xl">
                     {p.description}
@@ -153,12 +183,8 @@ export default function ProjectClient({ project: p }: { project: ProjectData }) 
             >
               <div className="h-px w-full bg-white/6" />
 
-              {p.client && (
-                <MetaRow label="Client" value={p.client} />
-              )}
-              {p.category && (
-                <MetaRow label="Category" value={p.category} />
-              )}
+              {p.client && <MetaRow label="Client" value={p.client} />}
+              {p.category && <MetaRow label="Category" value={p.category} />}
               {p.projectDate && (
                 <MetaRow
                   label="Date"
@@ -171,13 +197,18 @@ export default function ProjectClient({ project: p }: { project: ProjectData }) 
               {p.videoProvider && (
                 <MetaRow
                   label="Platform"
-                  value={p.videoProvider === "vimeo" ? "Vimeo" : "YouTube"}
+                  value={
+                    p.videoProvider === "vimeo"
+                      ? "Vimeo"
+                      : p.videoProvider === "youtube"
+                      ? "YouTube"
+                      : "Self-hosted"
+                  }
                 />
               )}
 
               <div className="h-px w-full bg-white/6" />
 
-              {/* CTA */}
               <a
                 href="/#contact"
                 className="group relative px-8 py-4 bg-white text-black text-xs font-black uppercase tracking-[0.2em] overflow-hidden text-center"
@@ -189,7 +220,6 @@ export default function ProjectClient({ project: p }: { project: ProjectData }) 
           </div>
         </div>
 
-        {/* Divider */}
         <div className="container mx-auto px-6 md:px-12">
           <div className="h-px bg-linear-to-r from-[#C2B280]/20 via-zinc-700/20 to-transparent" />
         </div>
@@ -208,19 +238,12 @@ export default function ProjectClient({ project: p }: { project: ProjectData }) 
             className="grid grid-cols-1 md:grid-cols-2 gap-4"
           >
             {p.prevProject ? (
-              <ProjectNavCard
-                project={p.prevProject}
-                direction="prev"
-              />
+              <ProjectNavCard project={p.prevProject} direction="prev" />
             ) : (
-              <div /> /* empty placeholder to keep next card right-aligned */
+              <div />
             )}
-
             {p.nextProject && (
-              <ProjectNavCard
-                project={p.nextProject}
-                direction="next"
-              />
+              <ProjectNavCard project={p.nextProject} direction="next" />
             )}
           </motion.div>
         </section>
@@ -263,15 +286,12 @@ function ProjectNavCard({
         className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 group-hover:scale-105 transition-all duration-700"
       />
       <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent" />
-
       <div className="relative z-10 w-full flex items-end justify-between gap-4">
         <div>
           <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-zinc-500 mb-1">
             {direction === "prev" ? "← Previous" : "Next →"}
           </p>
-          <p className="text-lg font-black tracking-tight text-white">
-            {project.title}
-          </p>
+          <p className="text-lg font-black tracking-tight text-white">{project.title}</p>
         </div>
         <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center shrink-0 group-hover:border-[#C2B280]/50 group-hover:rotate-45 transition-all duration-500">
           <svg
@@ -291,12 +311,11 @@ function ProjectNavCard({
 /* ─── Embed URL builder ──────────────────────────────────────────────── */
 function buildEmbedUrl(
   url: string | null,
-  provider: "vimeo" | "youtube" | null
+  provider: "vimeo" | "youtube" | "self-hosted" | null
 ): string | null {
-  if (!url) return null;
+  if (!url || provider === "self-hosted") return null;
 
   if (provider === "vimeo") {
-    // Ensure it's the embed format with useful params
     const base = url.includes("player.vimeo.com")
       ? url
       : url.replace("vimeo.com/", "player.vimeo.com/video/");
@@ -305,16 +324,12 @@ function buildEmbedUrl(
   }
 
   if (provider === "youtube") {
-    // Ensure it's the embed format
     const base = url.includes("youtube.com/embed")
       ? url
-      : url
-          .replace("watch?v=", "embed/")
-          .replace("youtu.be/", "youtube.com/embed/");
+      : url.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/");
     const separator = base.includes("?") ? "&" : "?";
     return `${base}${separator}rel=0&modestbranding=1&color=white`;
   }
 
-  // Unknown provider — return as-is and hope for the best
   return url;
 }
