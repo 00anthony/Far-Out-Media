@@ -69,8 +69,8 @@ export async function POST(req: NextRequest) {
     await Promise.all([
       // 1. Internal notification
       resend.emails.send({
-        from: "Far Out Media <onboarding@resend.dev>", // ← your verified sender
-        to: ["anthonytij3@gmail.com"],                 // ← your receiving address
+        from: "Far Out Media <quote@faroutmediaco.com>", // ← your verified sender
+        to: ["cam@faroutmediaco.com"],                 // ← your receiving address
         replyTo: email,
         subject: `New Quote Request from ${name}${body.company ? ` · ${body.company}` : ""}`,
         html: buildInternalEmail({ name, email, extraFields }),
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
 
       // 2. Auto-reply to user
       resend.emails.send({
-        from: "Far Out Media <onboarding@resend.dev>", // ← your verified sender
+        from: "Far Out Media <noreply@faroutmediaco.com>", // ← your verified sender
         to: [email],
         subject: "We received your quote request · Far Out Media",
         html: buildAutoReplyEmail({ name, projectType: body.projectType ?? "" }),
