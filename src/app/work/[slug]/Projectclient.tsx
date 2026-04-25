@@ -169,6 +169,7 @@ export default function ProjectClient({ project: p }: { project: ProjectData }) 
                   })}
                 />
               )}
+              {/*
               {p.videoProvider && (
                 <MetaRow
                   label="Platform"
@@ -181,6 +182,7 @@ export default function ProjectClient({ project: p }: { project: ProjectData }) 
                   }
                 />
               )}
+              */}
 
               <div className="h-px w-full bg-white/6" />
 
