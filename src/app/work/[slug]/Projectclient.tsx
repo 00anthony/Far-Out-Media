@@ -1,14 +1,13 @@
 // app/work/[slug]/Projectclient.tsx
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import type { ProjectData } from "./page";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
 export default function ProjectClient({ project: p }: { project: ProjectData }) {
-  const [playerReady, setPlayerReady] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const infoRef = useRef<HTMLDivElement>(null);
@@ -50,73 +49,49 @@ export default function ProjectClient({ project: p }: { project: ProjectData }) 
 
       {/* ════════════════════════════════════
           VIDEO PLAYER
+          pt-28 on mobile clears the fixed nav (~112px).
+          On md+ screens there's no overlap so pt-0 is fine.
       ════════════════════════════════════ */}
-      <section ref={heroRef} className="relative w-full pt-0">
+      <section ref={heroRef} className="relative w-full pt-28 md:pt-0">
 
         {/* ── A: Self-hosted file from Sanity CDN ── */}
         {isSelfHosted ? (
           <div className="relative w-full bg-black" style={{ paddingBottom: "56.25%" }}>
-            {!playerReady && (
-              <div className="absolute inset-0 z-10">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={p.thumbnail}
-                  alt={p.thumbnailAlt}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center animate-pulse">
-                    <svg className="w-6 h-6 ml-1" fill="white" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            )}
             <video
-              className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${
-                playerReady ? "opacity-100" : "opacity-0"
-              }`}
+              className="absolute inset-0 w-full h-full"
               controls
               playsInline
               preload="metadata"
               poster={p.thumbnail}
-              onCanPlay={() => setPlayerReady(true)}
+              // No opacity trick — poster handles the pre-play state natively,
+              // which is required for iOS Safari to allow user-initiated playback.
             >
+              {/*
+                Serve the same URL for both source tags. Sanity's CDN returns
+                the correct Content-Type header, so the browser picks whichever
+                <source> it can play. Listing mp4 first means iOS always finds it.
+              */}
               <source src={p.videoFileUrl!} type="video/mp4" />
-              Your browser does not support the video tag.
+              <source src={p.videoFileUrl!} type="video/webm" />
             </video>
           </div>
 
         /* ── B: Vimeo / YouTube embed ── */
         ) : embedUrl ? (
           <div className="relative w-full bg-black" style={{ paddingBottom: "56.25%" }}>
-            {!playerReady && (
-              <div className="absolute inset-0 z-10">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={p.thumbnail}
-                  alt={p.thumbnailAlt}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <div className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center animate-pulse">
-                    <svg className="w-6 h-6 ml-1" fill="white" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Thumbnail shown while iframe loads — safe for desktop/Android.
+                iOS opens iframes in a separate player anyway so this never blocks. */}
+            <img
+              src={p.thumbnail}
+              alt={p.thumbnailAlt}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
             <iframe
               ref={iframeRef}
               src={embedUrl}
-              className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${
-                playerReady ? "opacity-100" : "opacity-0"
-              }`}
+              className="absolute inset-0 w-full h-full"
               allow="autoplay; fullscreen; picture-in-picture"
               allowFullScreen
-              onLoad={() => setPlayerReady(true)}
               title={p.title}
             />
           </div>
